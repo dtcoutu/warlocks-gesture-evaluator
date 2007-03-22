@@ -5,17 +5,19 @@
 // ==/UserScript==
 
 /*
- * Future ideas:
- *  - Interpret gestures made for the next round.
- *     - Outside of the tables for the players - two fonts tags may or may not
- *       be there - first holds "LH: ?", the second holds "RH: ?".
- *  - Correctly handle gestures available when looking at previous rounds.
- *     - Normally the 2 and 4 font tags hold left and right gestures, but
- *       when looking at previous turns its 2 and 5 because the upcoming
- *       gestures have a different font applied.
- *  - Allow option to indicate which spell lists are open by default:
- *      none, user only, all
- *     - I believe this is done (painfully) via the GM_registerMenuCommand
+     Copyright 2007 David T. Coutu
+     
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+     
+     	http://www.apache.org/licenses/LICENSE-2.0
+     
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License. 
  */
 
 function Player(name, leftHand, rightHand)
