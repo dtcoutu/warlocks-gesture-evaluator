@@ -336,21 +336,26 @@ function evaluateGestures(gestures)
                }
                gesturesToMatch = currentGesture + gesturesToMatch;
                var matchedSpells = getMatchedSpells(gesturesToMatch);
+               debug("gestures = " + gesturesToMatch + "; " + matchedSpells.length);
                allMatchedSpells[gesturesLength] = new Array();
 
                // Find completed spells
                for (var x=0; x<matchedSpells.length; x++)
                {
                        var currentSpell = matchedSpells[x];
+                       debug("currentSpell = " + currentSpell.gestures + "; " + currentSpell.name + ": " + currentSpell.gestures.length);
                        if (gesturesLength == currentSpell.gestures.length)
                        {
+                       debug("matched spell!");
                                var index = allMatchedSpells[0].length;
                                allMatchedSpells[0][index] = currentSpell;
                                // Might even use splice to add the item to the other array...
                                matchedSpells.splice(x, 1);
+                               // Compensate for removing item from array.
+                               x--;
                        }
 
-                       // Look through the previous array of spells if there is one
+                       // Look through the previous arrays of spells if there is one
                        // to remove duplicates.
                        if (gesturesLength > 1)
                        {
@@ -380,34 +385,6 @@ function getMatchedSpells(gestures)
        return getSpellsMatchExpression(new RegExp("^" + gestures));
 }
 
-function getMaxSpellCount(spells)
-{
-       // count spells from left hand
-       var count = getSpellCount(spells[0]);
-
-       // count spells from right hand
-       var rightCount = getSpellCount(spells[1]);
-
-       // return the larger number
-       if (rightCount > count)
-       {
-               count = rightCount;
-       }
-
-       return count;
-}
-
-function getSpellCount(spellArray)
-{
-       var count = 0;
-       for (var i=0; i<spellArray.length; i++)
-       {
-               count += spellArray[i].length;
-       }
-
-       return count;
-}
-
 /*
  * Given a string of gestures as a regular expression walk through the list of
  * spells and find ones with gestures that match it.
@@ -421,6 +398,7 @@ function getSpellsMatchExpression(expression)
        {
                if (expression.test(spellList[x].gestures))
                {
+               		debug("matched spell = " + spellList[x].gestures + "; " + spellList[x].name + ": " + spellList[x].gestures.length);
                        matchedSpells[matchedSpellsIndex] = spellList[x];
                        matchedSpellsIndex++;
                }

@@ -25,12 +25,12 @@
   		
   		for (var i=0; i<expectedSpells.length; i++)
   		{
-  			assertEquals("Spell arrays should have the same length",
+  			assertEquals("Spell array " + i + " should have the same length",
   				expectedSpells[i].length, actualSpells[i].length);
   			
   			for (var j=0; j<expectedSpells[i].length; j++)
   			{
-  				assertTrue("Spells should be the same",
+  				assertTrue("Spells indexed by " + i + ", " + j + " should be the same",
   					expectedSpells[i][j].equals(actualSpells[i][j]));
   			}
   		}
@@ -121,6 +121,35 @@
 		assertEqualArrayOfSpellArrays(expectedResult, actualResult);
   	}
   	
+  	function testEvaluateGestures_InvisGestures_Fd()
+  	{
+  		var inputData = "???Fd";
+  		var expectedResult = new Array();
+  		expectedResult[0] = new Array();
+  		expectedResult[0][0] = new Spell("WPFD", "Cause Heavy Wounds");
+  		expectedResult[0][1] = new Spell("DFWFd", "Blindness");
+  		expectedResult[0][2] = new Spell("DWFFd", "Blindness");
+  		expectedResult[0][3] = new Spell("SPPFD", "Time Stop");
+  		
+  		expectedResult[1] = new Array();
+  		expectedResult[1][0] = new Spell("DFPW", "Cure Heavy Wounds");
+  		expectedResult[1][1] = new Spell("DFW", "Cure Light Wounds");
+  		expectedResult[1][2] = new Spell("DPP", "Amnesia");
+  		expectedResult[1][3] = new Spell("DSF", "Confusion/Maladroitness");
+  		expectedResult[1][4] = new Spell("DSFFFc", "Disease");
+  		expectedResult[1][5] = new Spell("DWSSSP", "Delay Effect");
+  		expectedResult[1][6] = new Spell("DWWFWD", "Poison");
+  		
+  		expectedResult[4] = new Array();
+  		expectedResult[4][0] = new Spell("DFFDD", "Lightning Bolt");
+  		
+  		expectedResult[5] = new Array();
+		
+		var actualResult = evaluateGestures(inputData);
+		
+		assertEqualArrayOfSpellArrays(expectedResult, actualResult);
+  	}
+  	
     function testGetMatchedSpells()
     {
     	//TODO: How can object equality be done in javascript?
@@ -139,47 +168,6 @@
     	var matchedSpells = getMatchedSpells("D");
     	
     	assertEqualSpellArrays(expectedSpells, matchedSpells);
-    }
-    
-    function testGetMaxSpellCount()
-    {
-    	var spells = new Array(2);
-    	spells[0] = new Array();
-    	spells[0][0] = new Array();
-    	spells[0][1] = new Array();
-		spells[0][1][0] = new Spell("SD", "Magic Missile");
-		spells[0][1][1] = new Spell("SFW", "Summon Goblin");
-		spells[0][1][2] = new Spell("SPFP", "Anti-spell");
-		spells[0][1][3] = new Spell("SPFPSDW", "Permanency");
-		spells[0][1][4] = new Spell("SPPc", "Time Stop");
-		spells[0][1][5] = new Spell("SPPFD", "Time Stop");
-		spells[0][1][6] = new Spell("SSFP", "Resist Cold");
-		spells[0][1][7] = new Spell("SWD", "Fear (No CFDS)");
-		spells[0][1][8] = new Spell("SWWc", "Fire Storm");
-
-    	spells[0][2] = new Array();
-		spells[0][2][0] = new Spell("PSDD", "Charm Monster");
-		spells[0][2][1] = new Spell("PSDF", "Charm Person");
-		spells[0][2][2] = new Spell("PSFW", "Summon Ogre");
-
-		spells[1] = new Array();
-    	spells[1][0] = new Array();
-    	spells[1][1] = new Array();
-		spells[1][1][0] = new Spell("WDDc", "+ Clap of Lightning");
-		spells[1][1][1] = new Spell("WFP", "Cause Light Wounds");
-		spells[1][1][2] = new Spell("WFPSFW", "Summon Giant");
-		spells[1][1][3] = new Spell("WPFD", "Cause Heavy Wounds");
-		spells[1][1][4] = new Spell("WPP", "Counter Spell");
-		spells[1][1][5] = new Spell("WSSc", "Ice Storm");
-
-    	spells[1][2] = new Array();
-		spells[1][2][0] = new Spell("WWFP", "Resist Heat");
-		spells[1][2][1] = new Spell("WWP", "Protection");
-		spells[1][2][2] = new Spell("WWS", "Counter Spell");
-		
-		var count = getMaxSpellCount(spells);
-		
-		assertEquals(12, count);
     }
     
     function testProcessPlayer()
