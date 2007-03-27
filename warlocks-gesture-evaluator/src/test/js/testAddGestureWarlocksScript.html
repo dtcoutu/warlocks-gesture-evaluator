@@ -140,6 +140,9 @@
   		expectedResult[1][5] = new Spell("DWSSSP", "Delay Effect");
   		expectedResult[1][6] = new Spell("DWWFWD", "Poison");
   		
+  		expectedResult[2] = new Array();
+  		expectedResult[3] = new Array();
+  		
   		expectedResult[4] = new Array();
   		expectedResult[4][0] = new Spell("DFFDD", "Lightning Bolt");
   		
@@ -216,6 +219,35 @@
     function testProcessWarlocksPage()
     {
     	processWarlocksPage();
+    }
+    
+    function testRemovePreviouslyMatchedSpells()
+    {
+    	var spell = new Spell("DFFDD", "Lightning Bolt");
+    	var matchedSpells = new Array();
+    	matchedSpells[0] = new Array();
+    	
+    	matchedSpells[1] = new Array();
+    	matchedSpells[1][0] = new Spell("DFFDD", "Lightning Bolt");
+    	matchedSpells[1][1] = new Spell("DSF", "Confusion/Maladroit");
+    	
+    	matchedSpells[2] = new Array();
+    	
+    	matchedSpells[3] = new Array();
+    	
+    	var expectedResult = new Array();
+    	expectedResult[0] = new Array();
+    	
+    	expectedResult[1] = new Array();
+    	expectedResult[1][0] = new Spell("DSF", "Confusion/Maladroit");
+    	
+    	expectedResult[2] = new Array();
+    	
+    	expectedResult[3] = new Array();
+    
+    	var actualResult = removePreviouslyMatchedSpells(spell, matchedSpells);
+    	
+    	assertEqualArrayOfSpellArrays(expectedResult, actualResult);
     }
     
     function testSpellEquals()

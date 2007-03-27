@@ -336,17 +336,14 @@ function evaluateGestures(gestures)
                }
                gesturesToMatch = currentGesture + gesturesToMatch;
                var matchedSpells = getMatchedSpells(gesturesToMatch);
-               debug("gestures = " + gesturesToMatch + "; " + matchedSpells.length);
                allMatchedSpells[gesturesLength] = new Array();
 
                // Find completed spells
                for (var x=0; x<matchedSpells.length; x++)
                {
                        var currentSpell = matchedSpells[x];
-                       debug("currentSpell = " + currentSpell.gestures + "; " + currentSpell.name + ": " + currentSpell.gestures.length);
                        if (gesturesLength == currentSpell.gestures.length)
                        {
-                       debug("matched spell!");
                                var index = allMatchedSpells[0].length;
                                allMatchedSpells[0][index] = currentSpell;
                                // Might even use splice to add the item to the other array...
@@ -355,19 +352,7 @@ function evaluateGestures(gestures)
                                x--;
                        }
 
-                       // Look through the previous arrays of spells if there is one
-                       // to remove duplicates.
-                       if (gesturesLength > 1)
-                       {
-                               for (var y=0; y<allMatchedSpells[gesturesLength-1].length; y++)
-                               {
-                                       var oldSpell = allMatchedSpells[gesturesLength-1][y];
-                                       if (currentSpell.equals(oldSpell))
-                                       {
-                                               allMatchedSpells[gesturesLength-1].splice(y, 1);
-                                       }
-                               }
-                       }
+					   allMatchedSpells = removePreviouslyMatchedSpells(currentSpell, allMatchedSpells);
                }
 
                allMatchedSpells[gesturesLength] = matchedSpells;
@@ -398,7 +383,6 @@ function getSpellsMatchExpression(expression)
        {
                if (expression.test(spellList[x].gestures))
                {
-               		debug("matched spell = " + spellList[x].gestures + "; " + spellList[x].name + ": " + spellList[x].gestures.length);
                        matchedSpells[matchedSpellsIndex] = spellList[x];
                        matchedSpellsIndex++;
                }
@@ -484,6 +468,27 @@ function processWarlocksPage()
        }
 
        setSpellTableStyle();
+}
+
+/*
+ * Remove the given spell from the list of previously matched spells.
+ */
+function removePreviouslyMatchedSpells(matchedSpell, previouslyMatched)
+{
+	var matchedSpells = previouslyMatched;
+	for (var y=1; y<matchedSpells.length; y++)
+	{
+		for (var z=0; z<matchedSpells[y].length; z++)
+		{
+			var oldSpell = matchedSpells[y][z];
+			if (matchedSpell.equals(oldSpell))
+			{
+				matchedSpells[y].splice(z, 1);
+			}
+		}
+	}
+	
+	return matchedSpells;
 }
 
 function setSpellTableStyle()
