@@ -25,8 +25,10 @@ function Player(name, leftHand, rightHand)
        this.hands = new Array(2);
        this.hands[0] = leftHand;
        this.hands[1] = rightHand;
+       this.isUser = false;
        this.name = name;
        this.spells = new Array(2);
+       this.submittedGestures = false;
 }
 
 function Spell(gestures, name)
@@ -392,6 +394,33 @@ function getSpellsMatchExpression(expression)
 }
 
 /*
+ * If the player being processed is the user and submitted gestures are found
+ * then the gestures are added to the array of gestures for each hand as
+ * appropriate and a value of true is returned.  Otherwise nothing is done and
+ * false is returned.
+ */
+function getSubmittedGestures(player)
+{
+	var foundSubmittedGestures = false;
+	
+	if (player.isUser)
+	{
+		var fonts = document.getElementsByTagName("font");
+		var submittedLeftHand = new RegExp("^LH: .$");
+		if (submittedLeftHand.test(fonts[(fonts.length-2)].textContent))
+		{
+			foundSubmittedGestures = true;
+			player.hands[0] = player.hands[0] +
+				fonts[(fonts.length-2)].textContent.substr(4, 1);
+			player.hands[1] = player.hands[1] +
+				fonts[(fonts.length-1)].textContent.substr(4, 1);
+		}
+	}
+	
+	return foundSubmittedGestures;
+}
+
+/*
  * Return true if the given character is lower case, otherwise false.
  */
 function isLowerCase(character)
@@ -426,8 +455,7 @@ function processWarlocksPage()
    // Use tables[0] to get the name of the using player
        var userName = (tables[0].getElementsByTagName("a"))[0].text;
        // Trim off the "Log out " text
-       userName = userName.substr(7);
-       debug("user name = " + userName);
+       userName = userName.substr(8);
 
        // Skip over the next two tables since those contain navigation stuff.
        // How do we skip over monsters? - they have owned by info...
@@ -452,12 +480,16 @@ function processWarlocksPage()
                        // First font holds the turn text
                        // Second holds LH: text
                        // Third holds the left hand gestures
-               // Forth holds RH: text
+					   // Fourth holds RH: text
                        // Fifth holds the right hand gestures
                        player = new Player(
                                nameAreaNodes[0].text,
                                fonts[2].textContent,
                                fonts[4].textContent);
+                       player.isUser = (player.name == userName);
+                       
+                       // Check for submitted gestures only for the user.
+                       player.submittedGestures = getSubmittedGestures(player);
 
                        player = processPlayer(player);
 
@@ -499,8 +531,10 @@ function setSpellTableStyle()
                GM_addStyle("#spellSection td { padding-right: 6px; }");
                GM_addStyle("#spellSection .alt { color: #AAAAAA; }");
                GM_addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
+               GM_addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italics; }");
                GM_addStyle("#spellSection th { font-size: smaller; }");
                GM_addStyle("#spellSection strong { color: tomato; }");
+               GM_addStyle("#spellSection em { color: yellow; font-weight: bold; }");
        }
 }
 
