@@ -127,53 +127,82 @@ function createJavaScript()
  * Generate the screen elements to display the given hand of spells.  Returns
  * an array of td elements.
  */
-function createSpellElements(spells)
+function createSpellElements(spells, submittedGestures)
 {
-       // Deal with complete matches, then go from most gestures matched to least.
-       var spellCell;
-       var cellCount = 0;
-       var strongTag;
-       var currentSpell;
-       var cellArray = new Array();
+	// Deal with complete matches, then go from most gestures matched to least.
+	var spellCell;
+	var cellCount = 0;
+	var cellText;
+	var gestureIndex;
+	var strongTag;
+	var strongText;
+	var submittedTag;
+	var submittedText;
+	var currentSpell;
+	var cellArray = new Array();
 
-       for (var x=0; x<spells[0].length; x++, cellCount++)
-       {
-               currentSpell = spells[0][x];
-               spellCell = document.createElement("td");
-               var cellText = document.createTextNode(
-                       currentSpell.gestures + ": " + currentSpell.name);
+	for (var x=0; x<spells[0].length; x++, cellCount++)
+	{
+		currentSpell = spells[0][x];
+		spellCell = document.createElement("td");
+		var cellText = document.createTextNode(
+			currentSpell.gestures + ": " + currentSpell.name);
 
-               spellCell.className = "complete";
-               spellCell.appendChild(cellText);
+		if (submittedGestures)
+		{
+			spellCell.className = "submittedComplete";
+		}
+		else
+		{
+			spellCell.className = "complete";
+		}
+		spellCell.appendChild(cellText);
 
-               cellArray[cellCount] = spellCell;
-       }
+		cellArray[cellCount] = spellCell;
+	}
 
-       for (var i=spells.length - 1; i>=1; i--)
-       {
-               for (var j=0; j<spells[i].length; j++, cellCount++)
-               {
-                       currentSpell = spells[i][j];
-                       spellCell = document.createElement("td");
-                       strongTag = document.createElement("strong");
-                       var strongText = document.createTextNode(
-                               currentSpell.gestures.substr(0,i));
-                       var cellText = document.createTextNode(
-                               currentSpell.gestures.substr(i) + ": " + currentSpell.name);
+	for (var i=spells.length - 1; i>=1; i--)
+	{
+		for (var j=0; j<spells[i].length; j++, cellCount++)
+		{
+			currentSpell = spells[i][j];
+			spellCell = document.createElement("td");
+			strongTag = document.createElement("strong");
 
-                       strongTag.appendChild(strongText);
-                       if ((cellCount % 2) == 1)
-                       {
-                               spellCell.className = "alt";
-                       }
-                       spellCell.appendChild(strongTag);
-                       spellCell.appendChild(cellText);
+			gestureIndex = i;
+			if (submittedGestures)
+			{
+				gestureIndex = i-1;
+			}
 
-                       cellArray[cellCount] = spellCell;
-               }
-       }
+			strongText = document.createTextNode(
+				currentSpell.gestures.substr(0, gestureIndex));
+			strongTag.appendChild(strongText);
+			spellCell.appendChild(strongTag);
 
-       return cellArray;
+			if (submittedGestures)
+			{
+				submittedTag = document.createElement("em");
+				submittedText = document.createTextNode(
+					currentSpell.gestures.substr(gestureIndex, 1));
+				submittedTag.appendChild(submittedText);
+				spellCell.appendChild(submittedTag);
+			}
+			
+			cellText = document.createTextNode(
+				currentSpell.gestures.substr(i) + ": " + currentSpell.name);
+
+			if ((cellCount % 2) == 1)
+			{
+				spellCell.className = "alt";
+			}
+			spellCell.appendChild(cellText);
+
+			cellArray[cellCount] = spellCell;
+		}
+	}
+
+	return cellArray;
 }
 
 /*
@@ -222,11 +251,8 @@ function createSpellSection(player, table)
  */
 function createSpellSectionContent(player, spellTableBody)
 {
-       var leftSpells = player.spells[0];
-       var rightSpells = player.spells[1];
-
-       var leftSpellElements = createSpellElements(leftSpells);
-       var rightSpellElements = createSpellElements(rightSpells);
+       var leftSpellElements = createSpellElements(player.spells[0], player.submittedGestures);
+       var rightSpellElements = createSpellElements(player.spells[1], player.submittedGestures);
 
        var spellRowMinCount = leftSpellElements.length;
        var spellRowMaxCount = rightSpellElements.length;
@@ -557,3 +583,5 @@ function trimInvalidGestures(gestures)
 
        return trimmedGestures;
 }
+
+processWarlocksPage();
