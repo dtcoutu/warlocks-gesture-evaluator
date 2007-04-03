@@ -55,12 +55,12 @@ spellList[5] = new Spell("DFPW", "Cure Heavy Wounds");
 spellList[6] = new Spell("DFW", "Cure Light Wounds");
 spellList[7] = new Spell("DFWFd", "Blindness");
 spellList[8] = new Spell("DPP", "Amnesia");
-spellList[9] = new Spell("DSF", "Confusion/Maladroitness");
+spellList[9] = new Spell("DSF", "Confusion");
 spellList[10] = new Spell("DSFFFc", "Disease");
 spellList[11] = new Spell("DWFFd", "Blindness");
 spellList[12] = new Spell("DWSSSP", "Delay Effect");
 spellList[13] = new Spell("DWWFWD", "Poison");
-spellList[14] = new Spell("FFF", "Paralysis (CSW --> FDP");
+spellList[14] = new Spell("FFF", "Paralysis (CSW --> FDP)");
 spellList[15] = new Spell("FPSFW", "Summon Troll");
 spellList[16] = new Spell("FSSDD", "Fireball");
 spellList[17] = new Spell("P", "Shield");
@@ -454,6 +454,22 @@ function isLowerCase(character)
        return ((character >= 'a') && (character <= 'z'));
 }
 
+function modifyForGameType()
+{
+	var h2Tags = document.getElementsByTagName("h2");
+	var gameTitle = h2Tags[h2Tags.length-1].textContent
+	
+	if (gameTitle.match(/\(Maladroit\)/))
+	{
+		spellList[9] = new Spell("DSF", "Maladroitness");
+	}
+	
+	if (gameTitle.match(/\(ParaFC\)/))
+	{
+		spellList[14] = new Spell("FFF", "Paralysis (FSW --> CDP)");
+	}
+}
+
 /*
  * Given a single player evaluate the gestures they are working on and return
  * a list of spells for each hand.
@@ -482,6 +498,8 @@ function processWarlocksPage()
        var userName = (tables[0].getElementsByTagName("a"))[0].text;
        // Trim off the "Log out " text
        userName = userName.substr(8);
+       
+       modifyForGameType();
 
        // Skip over the next two tables since those contain navigation stuff.
        // How do we skip over monsters? - they have owned by info...
@@ -526,9 +544,6 @@ function processWarlocksPage()
                            rightHandText = fonts[4].childNodes[0].textContent;
                        }
                        
-                       debug("leftHandText = " + fonts[2].childNodes[0].textContent);
-                       debug("rightHandText = " + rightHandText);
-
                        player = new Player(
                                nameAreaNodes[0].text,
                                fonts[2].childNodes[0].textContent,
