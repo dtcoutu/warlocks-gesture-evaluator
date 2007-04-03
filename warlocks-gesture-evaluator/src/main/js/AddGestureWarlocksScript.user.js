@@ -20,6 +20,10 @@
      limitations under the License. 
  */
 
+// Expects value of "none", "user" or "all" and indicates what spell lists will
+// start expanded.
+var defaultSpellListDisplay = "none";
+
 function Player(name, leftHand, rightHand)
 {
        this.hands = new Array(2);
@@ -218,12 +222,24 @@ function createSpellSection(player, table)
        spellCell.colSpan = 2;
        var expandCollapse = document.createElement("a");
        expandCollapse.id = "expandCollapseLink_" + player.name;
-       expandCollapse.href =
-               "javascript:showSpells('" + player.name + "')";
-       expandCollapse.appendChild(document.createTextNode("+"));
        var spellTable = document.createElement("table");
        spellTable.id = "spells_" + player.name;
-       spellTable.style.display = 'none';
+
+       if ((defaultSpellListDisplay == "none")
+           || ((defaultSpellListDisplay == "user") && (!player.isUser)))
+       {
+           expandCollapse.href =
+               "javascript:showSpells('" + player.name + "')";
+           expandCollapse.appendChild(document.createTextNode("+"));
+           spellTable.style.display = 'none';
+       }
+       else
+       {
+           expandCollapse.href =
+               "javascript:hideSpells('" + player.name + "')";
+           expandCollapse.appendChild(document.createTextNode("-"));
+       }
+       
        var spellTableBody = document.createElement("tbody");
        var spellHandHeaderRow = document.createElement("tr");
        var spellHandLeftHeader = document.createElement("th");
