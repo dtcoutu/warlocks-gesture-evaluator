@@ -502,37 +502,16 @@ function processWarlocksPage()
 
                        // The third td contains the gestures
                        var fonts = tds[2].getElementsByTagName("font");
-                       var rightHandText;
 
                        // First font holds the turn text
                        // Second holds LH: text
                        // Third holds the left hand gestures
 					   // Fourth holds RH: text
                        // Fifth holds the right hand gestures
-
-                       // When looking at previous rounds of a match a second
-                       // set of <font> tags are put inside of the existing
-                       // ones.  Therefore the above notes become
-                       // Fourth holds future left hand gestures
-                       // Fifth holds RH: text
-                       // Sixth holds the right hand gestures
-                       // Seventh holds the future right hand gestures.
-                       if (fonts[2].childNodes.length > 1)
-                       {
-                           rightHandText = fonts[5].childNodes[0].textContent;
-                       }
-                       else
-                       {
-                           rightHandText = fonts[4].childNodes[0].textContent;
-                       }
-                       
-                       debug("leftHandText = " + fonts[2].childNodes[0].textContent);
-                       debug("rightHandText = " + rightHandText);
-
                        player = new Player(
                                nameAreaNodes[0].text,
-                               fonts[2].childNodes[0].textContent,
-                               rightHandText);
+                               fonts[2].textContent,
+                               fonts[4].textContent);
                        player.isUser = (player.name == userName);
                        
                        // Check for submitted gestures only for the user.
