@@ -448,14 +448,24 @@ function getSubmittedGestures(player)
 	if (player.isUser)
 	{
 		var fonts = document.getElementsByTagName("font");
-		var submittedLeftHand = new RegExp("^LH: .$");
+		var submittedLeftHand = new RegExp("^LH: .");
+		var fontsOffset = 2;
 		if (submittedLeftHand.test(fonts[(fonts.length-2)].textContent))
 		{
 			foundSubmittedGestures = true;
+		}
+		else if (submittedLeftHand.test(fonts[(fonts.length-3)].textContent))
+		{
+			fontsOffset = 3;
+			foundSubmittedGestures = true;
+		}
+		
+		if (foundSubmittedGestures)
+		{
 			player.hands[0] = player.hands[0] +
-				fonts[(fonts.length-2)].textContent.substr(4, 1);
+				fonts[(fonts.length-fontsOffset)].textContent.substr(4, 1);
 			player.hands[1] = player.hands[1] +
-				fonts[(fonts.length-1)].textContent.substr(4, 1);
+				fonts[(fonts.length-(fontsOffset-1))].textContent.substr(4, 1);
 		}
 	}
 	
