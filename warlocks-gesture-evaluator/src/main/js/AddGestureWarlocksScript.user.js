@@ -29,6 +29,7 @@ function Player(name, leftHand, rightHand)
        this.hands = new Array(2);
        this.hands[0] = leftHand;
        this.hands[1] = rightHand;
+       this.isStillInGame = true;
        this.isUser = false;
        this.name = name;
        this.spells = new Array(2);
@@ -520,7 +521,7 @@ function processWarlocksPage()
        var playersIndex = 0;
        var tables = document.getElementsByTagName("table");
 
-   // Use tables[0] to get the name of the using player
+	// Use tables[0] to get the name of the using player
        var userName = (tables[0].getElementsByTagName("a"))[0].text;
        // Trim off the "Log out " text
        userName = userName.substr(8);
@@ -528,8 +529,6 @@ function processWarlocksPage()
        modifyForGameType();
 
        // Skip over the next two tables since those contain navigation stuff.
-       // How do we skip over monsters? - they have owned by info...
-       // For now ignore the one monster on this page.
        // Had a bug because the tables array was being updated by the insertion
        // of the new table for displaying the spells.  Don't know why it was
        // working in general though - makes me think I'm leaking something.
@@ -543,6 +542,16 @@ function processWarlocksPage()
                {
                        // It's a player instead of a monster so get their name
                        var playerName = nameAreaNodes[0].text;
+                       
+                       // determine if player is still in the match
+                       var healthText = tds[1].textContent;
+                       var playerStillInGame = true;
+                       if ((healthText.match(/^Surrendered/))
+                           || (healthText.match(/^Dead/)))
+                       {
+                           playerStillInGame = false;
+                       }
+                       
 
                        // The third td contains the gestures
                        var fonts = tds[2].getElementsByTagName("font");
@@ -575,6 +584,9 @@ function processWarlocksPage()
                                fonts[2].childNodes[0].textContent,
                                rightHandText);
                        player.isUser = (player.name == userName);
+                       player.isStillInGame = playerStillInGame;
+                       
+                       debug("player.isStillInGame = " + player.isStillInGame);
                        
                        // Check for submitted gestures only for the user.
                        player.submittedGestures = getSubmittedGestures(player);
