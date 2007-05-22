@@ -129,7 +129,27 @@ function createJavaScript()
 		'  element.href = oldLink.replace(/javascript:hideSpells/,\n' +
 		'      "javascript:showSpells");\n' +
 		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
-		'}\n';
+		'}\n\n' +
+		'// Display the spell completion table.\n' +
+		'function showGestures(playerName) {\n' +
+		'  var element = document.getElementById(\'gestures_\' + playerName);\n' +
+		'  element.style.display = \'\';\n' +
+		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
+		'  var oldLink = element.href;\n' +
+		'  element.href = oldLink.replace(/javascript:showGestures/,\n' +
+		'      "javascript:hideGestures");\n' +
+		'  element.replaceChild(document.createTextNode("-"), element.childNodes[0]);\n' +
+		'}\n\n' +
+		'// Hide the spell completion table.\n' +
+		'function hideGestures(playerName) {\n' +
+		'  var element = document.getElementById(\'gestures_\' + playerName);\n' +
+		'  element.style.display = \'none\';\n' +
+		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
+		'  var oldLink = element.href;\n' +
+		'  element.href = oldLink.replace(/javascript:hideGestures/,\n' +
+		'      "javascript:showGestures");\n' +
+		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
+        '}\n';
 
 	document.body.insertBefore(script, document.body.firstChild);
 }
@@ -531,6 +551,33 @@ function getSubmittedGestures(player)
 }
 
 /*
+ * Hide the gestures of the given player, but allow them to be shown if
+ * desired.
+ */
+function hidePlayerGestures(table, player)
+{
+	// Instead hide the characters gestures.
+	// Add tr/td with a tag for expand/collpase
+	// Update tr around Turns and gestures with id
+	// to be referenced by the previously created
+	// expand/collapse.
+	
+	var tr = (table.rows)[1];
+	tr.id = "gestures_" + player.name;
+	tr.style.display = 'none';
+	               
+	var expandCollapseRow = table.insertRow(1);
+	var expandCollapseCell = expandCollapseRow.insertCell(0);
+	expandCollapseCell.id = "gestureSection";
+	expandCollapseCell.colSpan = 2;
+	var expandCollapse = document.createElement("a");
+	expandCollapse.id = "expandCollapseLink_" + player.name;
+	expandCollapse.href =
+	    "javascript:showGestures('" + player.name + "')";
+	expandCollapse.appendChild(document.createTextNode("+"));
+	expandCollapseCell.appendChild(expandCollapse);
+}
+/*
  * Return true if the given character is lower case, otherwise false.
  */
 function isLowerCase(character)
@@ -614,7 +661,7 @@ function processWarlocksPage()
 	                   }
 	                   else
 	                   {
-	                       // Instead hide the characters gestures.
+	                       hidePlayerGestures(tables[x], player);
 	                   }
                }
                else
