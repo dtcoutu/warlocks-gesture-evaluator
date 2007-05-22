@@ -24,28 +24,34 @@
 // start expanded.
 var defaultSpellListDisplay = "none";
 
+function Monster(name, owner)
+{
+    this.name = name;
+    this.owner = owner;
+}
+
 function Player(name, leftHand, rightHand)
 {
-       this.hands = new Array(2);
-       this.hands[0] = leftHand;
-       this.hands[1] = rightHand;
-       this.isStillInGame = true;
-       this.isUser = false;
-       this.name = name;
-       this.spells = new Array(2);
-       this.submittedGestures = false;
+	this.hands = new Array(2);
+	this.hands[0] = leftHand;
+	this.hands[1] = rightHand;
+	this.isStillInGame = true;
+	this.isUser = false;
+	this.name = name;
+	this.spells = new Array(2);
+	this.submittedGestures = false;
 }
 
 function Spell(gestures, name)
 {
-       this.name = name;
-       this.gestures = gestures;
+	this.name = name;
+	this.gestures = gestures;
 
-       // Would like to find someway to make sure given parameter is a Spell
-       this.equals = function(spell)
-       {
-               return ((spell.name == this.name) && (spell.gestures == this.gestures));
-       }
+	// Would like to find someway to make sure given parameter is a Spell
+	this.equals = function(spell)
+	{
+		return ((spell.name == this.name) && (spell.gestures == this.gestures));
+	}
 }
 
 var validGesturesRegex = new RegExp("[\-|\>|\?|C|D|F|P|S|W]+");
@@ -102,30 +108,30 @@ spellList[43] = new Spell("WWS", "Counter Spell");
  */
 function createJavaScript()
 {
-       var script = document.createElement("script");
-       script.innerHTML =
-               '\n// Display the spell completion table.\n' +
-               'function showSpells(playerName) {\n' +
-               '  var element = document.getElementById(\'spells_\' + playerName);\n' +
-               '  element.style.display = \'\';\n' +
-               '  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-               '  var oldLink = element.href;\n' +
-               '  element.href = oldLink.replace(/javascript:showSpells/,\n' +
-               '      "javascript:hideSpells");\n' +
-           '  element.replaceChild(document.createTextNode("-"), element.childNodes[0]);\n' +
-       '}\n\n' +
-       '// Hide the spell completion table.\n' +
-       'function hideSpells(playerName) {\n' +
-               '  var element = document.getElementById(\'spells_\' + playerName);\n' +
-               '  element.style.display = \'none\';\n' +
-               '  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-               '  var oldLink = element.href;\n' +
-               '  element.href = oldLink.replace(/javascript:hideSpells/,\n' +
-               '      "javascript:showSpells");\n' +
-           '  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
-       '}\n';
+	var script = document.createElement("script");
+	script.innerHTML =
+		'\n// Display the spell completion table.\n' +
+		'function showSpells(playerName) {\n' +
+		'  var element = document.getElementById(\'spells_\' + playerName);\n' +
+		'  element.style.display = \'\';\n' +
+		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
+		'  var oldLink = element.href;\n' +
+		'  element.href = oldLink.replace(/javascript:showSpells/,\n' +
+		'      "javascript:hideSpells");\n' +
+		'  element.replaceChild(document.createTextNode("-"), element.childNodes[0]);\n' +
+		'}\n\n' +
+		'// Hide the spell completion table.\n' +
+		'function hideSpells(playerName) {\n' +
+		'  var element = document.getElementById(\'spells_\' + playerName);\n' +
+		'  element.style.display = \'none\';\n' +
+		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
+		'  var oldLink = element.href;\n' +
+		'  element.href = oldLink.replace(/javascript:hideSpells/,\n' +
+		'      "javascript:showSpells");\n' +
+		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
+		'}\n';
 
-       document.body.insertBefore(script, document.body.firstChild);
+	document.body.insertBefore(script, document.body.firstChild);
 }
 
 /*
@@ -412,7 +418,7 @@ function evaluateGestures(gestures)
  */
 function getMatchedSpells(gestures)
 {
-       return getSpellsMatchExpression(new RegExp("^" + gestures));
+	return getSpellsMatchExpression(new RegExp("^" + gestures));
 }
 
 /*
@@ -478,7 +484,7 @@ function getSubmittedGestures(player)
  */
 function isLowerCase(character)
 {
-       return ((character >= 'a') && (character <= 'z'));
+	return ((character >= 'a') && (character <= 'z'));
 }
 
 function modifyForGameType()
@@ -501,7 +507,7 @@ function modifyForGameType()
  * Given a single player evaluate the gestures they are working on and return
  * a list of spells for each hand.
  */
-function processPlayer(player)
+function processPlayerHands(player)
 {
        player.hands[0] = trimInvalidGestures(player.hands[0]);
        player.hands[1] = trimInvalidGestures(player.hands[1]);
@@ -519,6 +525,8 @@ function processWarlocksPage()
 
        var players = new Array();
        var playersIndex = 0;
+       var monsters = new Array();
+       var monstersIndex = 0;
        var tables = document.getElementsByTagName("table");
 
 	// Use tables[0] to get the name of the using player
@@ -529,9 +537,6 @@ function processWarlocksPage()
        modifyForGameType();
 
        // Skip over the next two tables since those contain navigation stuff.
-       // Had a bug because the tables array was being updated by the insertion
-       // of the new table for displaying the spells.  Don't know why it was
-       // working in general though - makes me think I'm leaking something.
        for (var x=3; x < tables.length; x++)
        {
                var tds = tables[x].getElementsByTagName("td");
@@ -586,18 +591,28 @@ function processWarlocksPage()
                        player.isUser = (player.name == userName);
                        player.isStillInGame = playerStillInGame;
                        
-                       debug("player.isStillInGame = " + player.isStillInGame);
-                       
                        // Check for submitted gestures only for the user.
                        player.submittedGestures = getSubmittedGestures(player);
 
-                       player = processPlayer(player);
+                       player = processPlayerHands(player);
 
                        createSpellSection(player, tables[x]);
                        // Increment one to skip over table created for spell section.
                        x++;
                }
+               else
+               {
+                   // It's a monster.
+                   monsters[monstersIndex] = new Monster(
+                       tds[0].textContent,
+                       tds[2].textContent.substr(10));
+                   monstersIndex++;
+               }
        }
+
+       // modify monster's in target drop downs.
+       // remember when a monster could possibly be summoned an additional
+       // target drop down will appear.
 
        setSpellTableStyle();
 }
