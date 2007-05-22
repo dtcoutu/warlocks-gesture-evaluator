@@ -422,6 +422,57 @@ function getMatchedSpells(gestures)
 }
 
 /*
+ * Given the document objects that comprise a player create a Player object
+ * to be used by the rest of the application by extracting the information
+ * desired from the document objects.
+ */
+function getPlayerObject(tds)
+{
+	// determine if player is still in the match
+	var healthText = tds[1].textContent;
+	var playerStillInGame = true;
+	if ((healthText.match(/^Surrendered/))
+		|| (healthText.match(/^Dead/)))
+	{
+		playerStillInGame = false;
+	}
+
+	// The third td contains the gestures
+	var fonts = tds[2].getElementsByTagName("font");
+	var rightHandText;
+	
+	// First font holds the turn text
+	// Second holds LH: text
+	// Third holds the left hand gestures
+	// Fourth holds RH: text
+	// Fifth holds the right hand gestures
+
+	// When looking at previous rounds of a match a second
+	// set of <font> tags are put inside of the existing
+	// ones.  Therefore the above notes become
+	// Fourth holds future left hand gestures
+	// Fifth holds RH: text
+	// Sixth holds the right hand gestures
+	// Seventh holds the future right hand gestures.
+	if (fonts[2].childNodes.length > 1)
+	{
+		rightHandText = fonts[5].childNodes[0].textContent;
+	}
+	else
+	{
+		rightHandText = fonts[4].childNodes[0].textContent;
+	}
+
+	player = new Player(
+		(tds[0].getElementsByTagName("a"))[0].text,
+		fonts[2].childNodes[0].textContent,
+		rightHandText);
+	player.isStillInGame = playerStillInGame;
+	
+	return player;
+}
+
+/*
  * Given a string of gestures as a regular expression walk through the list of
  * spells and find ones with gestures that match it.
  */
@@ -504,19 +555,22 @@ function modifyForGameType()
 }
 
 /*
- * Given a single player evaluate the gestures they are working on and return
- * a list of spells for each hand.
+ * Given a single player evaluate the gestures they are working on and update
+ * the player with a list of spells for each hand.
  */
 function processPlayerHands(player)
 {
-       player.hands[0] = trimInvalidGestures(player.hands[0]);
-       player.hands[1] = trimInvalidGestures(player.hands[1]);
-       player.hands = determineBothHandGestures(player.hands);
+	// Check for submitted gestures only for the user.
+	player.submittedGestures = getSubmittedGestures(player);
 
-       player.spells[0] = evaluateGestures(player.hands[0]);
-       player.spells[1] = evaluateGestures(player.hands[1]);
-
-       return player;
+	player.hands[0] = trimInvalidGestures(player.hands[0]);
+	player.hands[1] = trimInvalidGestures(player.hands[1]);
+	player.hands = determineBothHandGestures(player.hands);
+	
+	player.spells[0] = evaluateGestures(player.hands[0]);
+	player.spells[1] = evaluateGestures(player.hands[1]);
+	
+	return player;
 }
 
 function processWarlocksPage()
@@ -545,59 +599,13 @@ function processWarlocksPage()
                var nameAreaNodes = tds[0].getElementsByTagName("a");
                if (nameAreaNodes.length == 1)
                {
-                       // It's a player instead of a monster so get their name
-                       var playerName = nameAreaNodes[0].text;
-                       
-                       // determine if player is still in the match
-                       var healthText = tds[1].textContent;
-                       var playerStillInGame = true;
-                       if ((healthText.match(/^Surrendered/))
-                           || (healthText.match(/^Dead/)))
-                       {
-                           playerStillInGame = false;
-                       }
-                       
+                       player = getPlayerObject(tds);
+					   player.isUser = (player.name == userName);
 
-                       // The third td contains the gestures
-                       var fonts = tds[2].getElementsByTagName("font");
-                       var rightHandText;
-
-                       // First font holds the turn text
-                       // Second holds LH: text
-                       // Third holds the left hand gestures
-					   // Fourth holds RH: text
-                       // Fifth holds the right hand gestures
-
-                       // When looking at previous rounds of a match a second
-                       // set of <font> tags are put inside of the existing
-                       // ones.  Therefore the above notes become
-                       // Fourth holds future left hand gestures
-                       // Fifth holds RH: text
-                       // Sixth holds the right hand gestures
-                       // Seventh holds the future right hand gestures.
-                       if (fonts[2].childNodes.length > 1)
-                       {
-                           rightHandText = fonts[5].childNodes[0].textContent;
-                       }
-                       else
-                       {
-                           rightHandText = fonts[4].childNodes[0].textContent;
-                       }
-                       
-                       player = new Player(
-                               nameAreaNodes[0].text,
-                               fonts[2].childNodes[0].textContent,
-                               rightHandText);
-                       player.isUser = (player.name == userName);
-                       player.isStillInGame = playerStillInGame;
-                       
                        // Don't bother evaluating and creating spell stuff
                        // if the player is no longer in the game.
                        if (player.isStillInGame)
                        {
-	                       // Check for submitted gestures only for the user.
-	                       player.submittedGestures = getSubmittedGestures(player);
-	
 	                       player = processPlayerHands(player);
 	
 	                       createSpellSection(player, tables[x]);
