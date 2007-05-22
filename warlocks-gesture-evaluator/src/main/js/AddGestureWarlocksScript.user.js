@@ -591,14 +591,23 @@ function processWarlocksPage()
                        player.isUser = (player.name == userName);
                        player.isStillInGame = playerStillInGame;
                        
-                       // Check for submitted gestures only for the user.
-                       player.submittedGestures = getSubmittedGestures(player);
-
-                       player = processPlayerHands(player);
-
-                       createSpellSection(player, tables[x]);
-                       // Increment one to skip over table created for spell section.
-                       x++;
+                       // Don't bother evaluating and creating spell stuff
+                       // if the player is no longer in the game.
+                       if (player.isStillInGame)
+                       {
+	                       // Check for submitted gestures only for the user.
+	                       player.submittedGestures = getSubmittedGestures(player);
+	
+	                       player = processPlayerHands(player);
+	
+	                       createSpellSection(player, tables[x]);
+	                       // Increment one to skip over table created for spell section.
+	                       x++;
+	                   }
+	                   else
+	                   {
+	                       // Instead hide the characters gestures.
+	                   }
                }
                else
                {
