@@ -149,9 +149,79 @@ function createJavaScript()
 		'  element.href = oldLink.replace(/javascript:hideGestures/,\n' +
 		'      "javascript:showGestures");\n' +
 		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
-        '}\n';
+        '}\n\n';
 
 	document.body.insertBefore(script, document.body.firstChild);
+}
+
+/*
+ * Add javascript to the screen to check the inputs given and make sure silly
+ * mistakes are not being made.
+ */
+function createInputValidationScripts()
+{
+	var forms = (document.getElementsByTagName("form"));
+	
+	if (forms.length != 1)
+	{
+		return;
+	}
+
+	var script = document.createElement("script");
+	script.innerHTML =
+		'// Make sure inputs make sense.\n' +
+		'function checkInputs(form)\n' +
+		'{\n' +
+		'  var leftHandValue = form.LH[form.LH.selectedIndex].value;\n' +
+		'  var leftHandSpellValue = form.LHS[form.LHS.selectedIndex].value;\n' +
+		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].value;\n' +
+		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
+		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
+		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].value;\n' +
+		'  var confirmQuestion = "";\n' +
+		'\n' +
+		'  if (leftHandValue == "-")\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - do no gesture with left hand\\n";\n' +
+		'  }\n' +
+		'  if ((leftHandValue == "C") && (rightHandValue != "C"))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - clap only with left hand\\n";\n' +
+		'  }\n' +
+		'  if (rightHandValue == "-")\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - do no gesture with right hand\\n";\n' +
+		'  }\n' +
+		'  if ((rightHandValue == "C") && (leftHandValue != "C"))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - clap only with right hand\\n";\n' +
+		'  }\n' +
+		'\n' +
+		// These won't work since generally the user doesn't specify the spell.
+		// Would need to investigate their completion stuff to make it work.
+		'  if ((leftHandSpellValue.indexOf("Summon") > -1)\n' +
+		'    && (leftHandTargetValue != ""))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand\\n";\n' +
+		'  }\n' +
+		'  if ((rightHandSpellValue.indexOf("Summon") > -1)\n' +
+		'    && (rightHandTargetValue != ""))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand\\n";\n' +
+		'  }\n' +
+		'\n' +
+		'  if (confirmQuestion != "")\n' +
+		'  {\n' +
+		'    return confirm("Are you sure you want to:\\n" + confirmQuestion);\n' +
+		'  }\n' +
+		'  else\n' +
+		'  {\n' +
+		'    return true;\n' +
+		'  }\n' +
+		'}\n\n';
+	document.body.insertBefore(script, document.body.firstChild);
+
+    forms[0].attributes.getNamedItem('onsubmit').value = "return checkInputs(this);";
 }
 
 /*
@@ -623,6 +693,7 @@ function processPlayerHands(player)
 function processWarlocksPage()
 {
        createJavaScript();
+       createInputValidationScripts();
 
        var players = new Array();
        var playersIndex = 0;
