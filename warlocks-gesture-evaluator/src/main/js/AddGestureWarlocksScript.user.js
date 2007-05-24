@@ -27,6 +27,7 @@ var defaultSpellListDisplay = "none";
 function Monster(name, owner)
 {
     this.name = name;
+    this.nameWithOwner = owner + "\'s " + name;
     this.owner = owner;
 }
 
@@ -745,10 +746,7 @@ function processWarlocksPage()
                }
        }
 
-       // modify monster's in target drop downs.
-       // remember when a monster could possibly be summoned an additional
-       // target drop down will appear.
-
+       updateMonsterReferences();
        setSpellTableStyle();
 }
 
@@ -806,6 +804,35 @@ function trimInvalidGestures(gestures)
        }
 
        return trimmedGestures;
+}
+
+/*
+ * Modify the name for a monster in the various drop down lists to include
+ * the name of the owner so it is easier to identify them.
+ */
+function updateMonsterReferences()
+{
+       // modify monster's in target drop downs.
+       // remember when a monster could possibly be summoned an additional
+       // target drop down will appear.
+	var dropDowns = document.getElementsByTagName("select");
+	
+	for (var x = 2; x < dropDowns.length; x++)
+	{
+	    for (var y = 0; y < dropDowns[x].length; y++)
+	    {
+	        for (var z = 0; z < monsters.length; z++)
+	        {
+	            if (monsters[z].name == dropDowns[x].options[y].value)
+	            {
+	                dropDowns[x].options[y].textContent = monsters[z].nameWithOwner;
+	            }
+	        }
+	    }
+	
+	    // Need to skip over other non-target drop downs.
+	    if (x == 2) x = x + 2;
+	}
 }
 
 processWarlocksPage();
