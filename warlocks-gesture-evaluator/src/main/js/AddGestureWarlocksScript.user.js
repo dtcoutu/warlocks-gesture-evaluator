@@ -200,13 +200,13 @@ function createInputValidationScripts()
 		'    && (leftHandValue == "W")\n' +
 		'    && (leftHandTargetValue != ""))\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand\\n";\n' +
+		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand (which gives the target ownership)\\n";\n' +
 		'  }\n' +
 		'  if ((rightMonsterSummons)\n' +
 		'    && (rightHandValue == "W")\n' +
 		'    && (rightHandTargetValue != ""))\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand\\n";\n' +
+		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand (which gives the target ownership)\\n";\n' +
 		'  }\n' +
 		'\n' +
 		'  if (confirmQuestion != "")\n' +
