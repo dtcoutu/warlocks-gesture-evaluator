@@ -174,10 +174,8 @@ function createInputValidationScripts()
 		'function checkInputs(form)\n' +
 		'{\n' +
 		'  var leftHandValue = form.LH[form.LH.selectedIndex].value;\n' +
-		'  var leftHandSpellValue = form.LHS[form.LHS.selectedIndex].value;\n' +
 		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].value;\n' +
 		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
-		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
 		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].value;\n' +
 		'  var confirmQuestion = "";\n' +
 		'\n' +
@@ -198,14 +196,14 @@ function createInputValidationScripts()
 		'    confirmQuestion = confirmQuestion + " - clap only with right hand\\n";\n' +
 		'  }\n' +
 		'\n' +
-		// These won't work since generally the user doesn't specify the spell.
-		// Would need to investigate their completion stuff to make it work.
-		'  if ((leftHandSpellValue.indexOf("Summon") > -1)\n' +
+		'  if ((leftMonsterSummons)\n' +
+		'    && (leftHandValue == "W")\n' +
 		'    && (leftHandTargetValue != ""))\n' +
 		'  {\n' +
 		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand\\n";\n' +
 		'  }\n' +
-		'  if ((rightHandSpellValue.indexOf("Summon") > -1)\n' +
+		'  if ((rightMonsterSummons)\n' +
+		'    && (rightHandValue == "W")\n' +
 		'    && (rightHandTargetValue != ""))\n' +
 		'  {\n' +
 		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand\\n";\n' +
@@ -648,6 +646,40 @@ function hidePlayerGestures(table, player)
 	expandCollapse.appendChild(document.createTextNode("+"));
 	expandCollapseCell.appendChild(expandCollapse);
 }
+
+/*
+ * Set indicators of whether each hand could be used to summon a monster in
+ * the next round.
+ */
+function identifySummonMonsterCouldBeCast(player)
+{
+	var leftMonsterSummons = false;
+	var rightMonsterSummons = false;
+	
+	if (player.isUser)
+	{
+	    for (var y = 0; y < player.spells[0][2].length; y++)
+	    {
+	        if (spellList[27].equals(player.spells[0][2][y]))
+	        {
+	        	leftMonsterSummons = true;
+	        }
+	    }
+	    for (var y = 0; y < player.spells[1][2].length; y++)
+	    {
+	        if (spellList[27].equals(player.spells[1][2][y]))
+	        {
+	        	rightMonsterSummons = true;
+	        }
+	    }
+	}
+
+	var script = document.createElement("script");
+	script.innerHTML = 'var leftMonsterSummons = ' + leftMonsterSummons + ';\n' +
+	    'var rightMonsterSummons = ' + rightMonsterSummons + ';\n\n';
+	document.body.insertBefore(script, document.body.firstChild);
+}
+
 /*
  * Return true if the given character is lower case, otherwise false.
  */
@@ -680,9 +712,10 @@ function processPlayerHands(player)
 {
 	// Check for submitted gestures only for the user.
 	player.submittedGestures = getSubmittedGestures(player);
-
+	
 	player.hands[0] = trimInvalidGestures(player.hands[0]);
 	player.hands[1] = trimInvalidGestures(player.hands[1]);
+	
 	player.hands = determineBothHandGestures(player.hands);
 	
 	player.spells[0] = evaluateGestures(player.hands[0]);
@@ -726,6 +759,8 @@ function processWarlocksPage()
                        if (player.isStillInGame)
                        {
 	                       player = processPlayerHands(player);
+	                       
+	                       identifySummonMonsterCouldBeCast(player);
 	
 	                       createSpellSection(player, tables[x]);
 	                       // Increment one to skip over table created for spell section.
@@ -746,7 +781,7 @@ function processWarlocksPage()
                }
        }
 
-       updateMonsterReferences();
+       updateMonsterReferences(monsters);
        setSpellTableStyle();
 }
 
@@ -794,7 +829,7 @@ function trimInvalidGestures(gestures)
        var workingGestures = gestures.toUpperCase();
        var trimmedGestures = "";
        var validGestureMatches;
-
+       
        while ((workingGestures.length > 0)
                && ((validGestureMatches = validGesturesRegex.exec(workingGestures)) != null))
        {
@@ -810,7 +845,7 @@ function trimInvalidGestures(gestures)
  * Modify the name for a monster in the various drop down lists to include
  * the name of the owner so it is easier to identify them.
  */
-function updateMonsterReferences()
+function updateMonsterReferences(monsters)
 {
        // modify monster's in target drop downs.
        // remember when a monster could possibly be summoned an additional

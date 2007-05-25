@@ -13,7 +13,7 @@
     	
     	for (var i=0; i<expectedSpells.length; i++)
     	{
-    		assertTrue("Spells should be the same",
+    		assertTrue("Spells indexed by " + i + " should be the same",
     			expectedSpells[i].equals(actualSpells[i]));
     	}
   	}
@@ -135,7 +135,7 @@
   		expectedResult[1][0] = new Spell("DFPW", "Cure Heavy Wounds");
   		expectedResult[1][1] = new Spell("DFW", "Cure Light Wounds");
   		expectedResult[1][2] = new Spell("DPP", "Amnesia");
-  		expectedResult[1][3] = new Spell("DSF", "Confusion/Maladroitness");
+  		expectedResult[1][3] = new Spell("DSF", "Confusion");
   		expectedResult[1][4] = new Spell("DSFFFc", "Disease");
   		expectedResult[1][5] = new Spell("DWSSSP", "Delay Effect");
   		expectedResult[1][6] = new Spell("DWWFWD", "Poison");
@@ -162,7 +162,7 @@
 		expectedSpells[2] = new Spell("DFW", "Cure Light Wounds");
 		expectedSpells[3] = new Spell("DFWFd", "Blindness");
 		expectedSpells[4] = new Spell("DPP", "Amnesia");
-		expectedSpells[5] = new Spell("DSF", "Confusion/Maladroitness");
+		expectedSpells[5] = new Spell("DSF", "Confusion");
 		expectedSpells[6] = new Spell("DSFFFc", "Disease");
 		expectedSpells[7] = new Spell("DWFFd", "Blindness");
 		expectedSpells[8] = new Spell("DWSSSP", "Delay Effect");
@@ -173,7 +173,45 @@
     	assertEqualSpellArrays(expectedSpells, matchedSpells);
     }
     
-    function testProcessPlayer()
+    function testIdentifySummonMonsterCouldBeCast()
+    {
+    	var player = new Player("Rasper", "PSF", "DSF");
+    	player.isUser = true;
+    	
+    	var spells = new Array();
+    	spells[0] = new Array();
+		spells[0][1] = new Array();
+		spells[0][1][0] = new Spell("FFF", "Paralysis (CSW --> FDP)");
+		spells[0][1][1] = new Spell("FPSFW", "Summon Troll");
+		spells[0][1][2] = new Spell("FSSDD", "Fireball");
+		spells[0][2] = new Array();
+		spells[0][2][0] = new Spell("SFW", "Summon Goblin");
+		spells[0][3] = new Array();
+		spells[0][3][0] = new Spell("PSFW", "Summon Ogre");
+
+    	spells[1] = new Array();
+		spells[1][0] = new Array();
+		spells[1][0][0] = new Spell("DSF", "Confusion");
+		spells[1][1] = new Array();
+		spells[1][1][0] = new Spell("FFF", "Paralysis (CSW --> FDP)");
+		spells[1][1][1] = new Spell("FPSFW", "Summon Troll");
+		spells[1][1][2] = new Spell("FSSDD", "Fireball");
+		spells[1][2] = new Array();
+		spells[1][2][0] = new Spell("SFW", "Summon Goblin");
+		spells[1][3] = new Array();
+		spells[1][3][0] = new Spell("DSFFFc", "Disease");
+    	
+    	player.spells[0] = spells[0]
+    	player.spells[1] = spells[1]
+    	
+    	debug("testIdentifySummonMonsterCouldBeCast()");
+    	
+    	identifySummonMonsterCouldBeCast(player);
+    	
+    	debug("end testIndentifySummonMonsterCouldBeCast()");
+    }
+    
+    function testProcessPlayerHands()
     {
     	var expectedPlayer = new Player("Rasper", "PS", "WW");
     	
@@ -210,7 +248,7 @@
 		expectedPlayer.spells[1][2][1] = new Spell("WWP", "Protection");
 		expectedPlayer.spells[1][2][2] = new Spell("WWS", "Counter Spell");
 		
-    	var actualPlayer = processPlayer(expectedPlayer);
+    	var actualPlayer = processPlayerHands(expectedPlayer);
     	
     	assertEqualArrayOfSpellArrays(expectedPlayer.spells[0], actualPlayer.spells[0]);
     	assertEqualArrayOfSpellArrays(expectedPlayer.spells[1], actualPlayer.spells[1]);
