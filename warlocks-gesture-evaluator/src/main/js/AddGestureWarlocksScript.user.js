@@ -658,20 +658,26 @@ function identifySummonMonsterCouldBeCast(player)
 	
 	if (player.isUser)
 	{
-	    for (var y = 0; y < player.spells[0][2].length; y++)
+	    if (player.spells[0].length > 2)
 	    {
-	        if (spellList[27].equals(player.spells[0][2][y]))
-	        {
-	        	leftMonsterSummons = true;
-	        }
-	    }
-	    for (var y = 0; y < player.spells[1][2].length; y++)
-	    {
-	        if (spellList[27].equals(player.spells[1][2][y]))
-	        {
-	        	rightMonsterSummons = true;
-	        }
-	    }
+		    for (var y = 0; y < player.spells[0][2].length; y++)
+		    {
+		        if (spellList[27].equals(player.spells[0][2][y]))
+		        {
+		        	leftMonsterSummons = true;
+		        }
+		    }
+		}
+		if (player.spells[1].length > 2)
+		{
+		    for (var y = 0; y < player.spells[1][2].length; y++)
+		    {
+		        if (spellList[27].equals(player.spells[1][2][y]))
+		        {
+		        	rightMonsterSummons = true;
+		        }
+		    }
+		}
 	}
 
 	var script = document.createElement("script");

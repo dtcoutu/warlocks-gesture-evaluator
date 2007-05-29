@@ -204,11 +204,45 @@
     	player.spells[0] = spells[0]
     	player.spells[1] = spells[1]
     	
-    	debug("testIdentifySummonMonsterCouldBeCast()");
+    	identifySummonMonsterCouldBeCast(player);
+    }
+    
+    function testIdentifySummonMonsterCouldBeCast_False()
+    {
+    	var player = new Player("Rasper", "P", "D");
+    	player.isUser = true;
+    	
+    	var spells = new Array();
+    	spells[0] = new Array();
+    	spells[0][0] = new Array();
+    	spells[0][0][0] = new Spell("P", "Shield");
+		spells[0][1] = new Array();
+		spells[0][1][0] = new Spell("PDWP", "Remove Enchantment");
+		spells[0][1][1] = new Spell("PPws", "Invisibility");
+		spells[0][1][2] = new Spell("PSDD", "Charm Monster");
+		spells[0][1][3] = new Spell("PSDF", "Charm Person");
+		spells[0][1][4] = new Spell("PSFW", "Summon Ogre");
+		spells[0][1][5] = new Spell("PWPFSSSD", "Finger of Death");
+		spells[0][1][6] = new Spell("PWPWWc", "Haste");
+
+    	spells[1] = new Array();
+		spells[1][0] = new Array();
+		spells[1][1] = new Array();
+		spells[1][1][0] = new Spell("DFFDD", "Lightning Bolt");
+		spells[1][1][1] = new Spell("DFPW", "Cure Heavy Wounds");
+		spells[1][1][2] = new Spell("DFW", "Cure Light Wounds");
+		spells[1][1][3] = new Spell("DFWFd", "Blindness");
+		spells[1][1][4] = new Spell("DPP", "Amnesia");
+		spells[1][1][5] = new Spell("DSF", "Confusion");
+		spells[1][1][6] = new Spell("DSFFFc", "Disease");
+		spells[1][1][7] = new Spell("DWFFd", "Blindness");
+		spells[1][1][8] = new Spell("DWSSSP", "Delay Effect");
+		spells[1][1][9] = new Spell("DWWFWD", "Poison");
+    	
+    	player.spells[0] = spells[0]
+    	player.spells[1] = spells[1]
     	
     	identifySummonMonsterCouldBeCast(player);
-    	
-    	debug("end testIndentifySummonMonsterCouldBeCast()");
     }
     
     function testProcessPlayerHands()
