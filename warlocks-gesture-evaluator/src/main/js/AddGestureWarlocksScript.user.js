@@ -57,51 +57,51 @@ function Spell(gestures, name)
 
 var validGesturesRegex = new RegExp("[\-|\>|\?|C|D|F|P|S|W]+");
 
-var spellList = new Array();
-spellList[0] = new Spell("cDPW", "Dispel Magic");
-spellList[1] = new Spell("cSWWS", "Summon Ice Elemental");
-spellList[2] = new Spell("cWSSW", "Summon Fire Elemental");
-spellList[3] = new Spell("cw", "Magic Mirror");
-spellList[4] = new Spell("DFFDD", "Lightning Bolt");
-spellList[5] = new Spell("DFPW", "Cure Heavy Wounds");
-spellList[6] = new Spell("DFW", "Cure Light Wounds");
-spellList[7] = new Spell("DFWFd", "Blindness");
-spellList[8] = new Spell("DPP", "Amnesia");
-spellList[9] = new Spell("DSF", "Confusion");
-spellList[10] = new Spell("DSFFFc", "Disease");
-spellList[11] = new Spell("DWFFd", "Blindness");
-spellList[12] = new Spell("DWSSSP", "Delay Effect");
-spellList[13] = new Spell("DWWFWD", "Poison");
-spellList[14] = new Spell("FFF", "Paralysis (CSW --> FDP)");
-spellList[15] = new Spell("FPSFW", "Summon Troll");
-spellList[16] = new Spell("FSSDD", "Fireball");
-spellList[17] = new Spell("P", "Shield");
-spellList[18] = new Spell("p", "! Surrender");
-spellList[19] = new Spell("PDWP", "Remove Enchantment");
-spellList[20] = new Spell("PPws", "Invisibility");
-spellList[21] = new Spell("PSDD", "Charm Monster");
-spellList[22] = new Spell("PSDF", "Charm Person");
-spellList[23] = new Spell("PSFW", "Summon Ogre");
-spellList[24] = new Spell("PWPFSSSD", "Finger of Death");
-spellList[25] = new Spell("PWPWWc", "Haste");
-spellList[26] = new Spell("SD", "Magic Missile");
-spellList[27] = new Spell("SFW", "Summon Goblin");
-spellList[28] = new Spell("SPFP", "Anti-spell");
-spellList[29] = new Spell("SPFPSDW", "Permanency");
-spellList[30] = new Spell("SPPc", "Time Stop");
-spellList[31] = new Spell("SPPFD", "Time Stop");
-spellList[32] = new Spell("SSFP", "Resist Cold");
-spellList[33] = new Spell("SWD", "Fear (No CFDS)");
-spellList[34] = new Spell("SWWc", "Fire Storm");
-spellList[35] = new Spell("WDDc", "+ Clap of Lightning");
-spellList[36] = new Spell("WFP", "Cause Light Wounds");
-spellList[37] = new Spell("WFPSFW", "Summon Giant");
-spellList[38] = new Spell("WPFD", "Cause Heavy Wounds");
-spellList[39] = new Spell("WPP", "Counter Spell");
-spellList[40] = new Spell("WSSc", "Ice Storm");
-spellList[41] = new Spell("WWFP", "Resist Heat");
-spellList[42] = new Spell("WWP", "Protection");
-spellList[43] = new Spell("WWS", "Counter Spell");
+var spellListing = new Object();
+spellListing["cDPW"] = "Dispel Magic";
+spellListing["cSWWS"] = "Summon Ice Elemental";
+spellListing["cWSSW"] = "Summon Fire Elemental";
+spellListing["cw"] = "Magic Mirror";
+spellListing["DFFDD"] = "Lightning Bolt";
+spellListing["DFPW"] = "Cure Heavy Wounds";
+spellListing["DFW"] = "Cure Light Wounds";
+spellListing["DFWFd"] = "Blindness";
+spellListing["DPP"] = "Amnesia";
+spellListing["DSF"] = "Confusion";
+spellListing["DSFFFc"] = "Disease";
+spellListing["DWFFd"] = "Blindness";
+spellListing["DWSSSP"] = "Delay Effect";
+spellListing["DWWFWD"] = "Poison";
+spellListing["FFF"] = "Paralysis (CSW --> FDP)";
+spellListing["FPSFW"] = "Summon Troll";
+spellListing["FSSDD"] = "Fireball";
+spellListing["P"] = "Shield";
+spellListing["p"] = "! Surrender";
+spellListing["PDWP"] = "Remove Enchantment";
+spellListing["PPws"] = "Invisibility";
+spellListing["PSDD"] = "Charm Monster";
+spellListing["PSDF"] = "Charm Person";
+spellListing["PSFW"] = "Summon Ogre";
+spellListing["PWPFSSSD"] = "Finger of Death";
+spellListing["PWPWWc"] = "Haste";
+spellListing["SD"] = "Magic Missile";
+spellListing["SFW"] = "Summon Goblin";
+spellListing["SPFP"] = "Anti-spell";
+spellListing["SPFPSDW"] = "Permanency";
+spellListing["SPPc"] = "Time Stop";
+spellListing["SPPFD"] = "Time Stop";
+spellListing["SSFP"] = "Resist Cold";
+spellListing["SWD"] = "Fear (No CFDS)";
+spellListing["SWWc"] = "Fire Storm";
+spellListing["WDDc"] = "+ Clap of Lightning";
+spellListing["WFP"] = "Cause Light Wounds";
+spellListing["WFPSFW"] = "Summon Giant";
+spellListing["WPFD"] = "Cause Heavy Wounds";
+spellListing["WPP"] = "Counter Spell";
+spellListing["WSSc"] = "Ice Storm";
+spellListing["WWFP"] = "Resist Heat";
+spellListing["WWP"] = "Protection";
+spellListing["WWS"] = "Counter Spell";
 
 /*
  * Creates the javascript to be used by the program after the greasemonkey
@@ -567,19 +567,19 @@ function getPlayerObject(tds)
  */
 function getSpellsMatchExpression(expression)
 {
-       var matchedSpells = new Array();
-       var matchedSpellsIndex = 0;
-       // Get a list of spells that start with the given gesture
-       for (var x = 0; x < spellList.length; x++)
-       {
-               if (expression.test(spellList[x].gestures))
-               {
-                       matchedSpells[matchedSpellsIndex] = spellList[x];
-                       matchedSpellsIndex++;
-               }
-       }
+	var matchedSpells = new Array();
+	var matchedSpellsIndex = 0;
 
-       return matchedSpells;
+	for (spell in spellListing)
+	{
+		if (expression.test(spell))
+		{
+			matchedSpells[matchedSpellsIndex] = new Spell(spell, spellListing[spell]);
+			matchedSpellsIndex++;
+		}
+	}
+       
+	return matchedSpells;
 }
 
 /*
@@ -662,7 +662,7 @@ function identifySummonMonsterCouldBeCast(player)
 	    {
 		    for (var y = 0; y < player.spells[0][2].length; y++)
 		    {
-		        if (spellList[27].equals(player.spells[0][2][y]))
+		        if ("SFW" == (player.spells[0][2][y].name))
 		        {
 		        	leftMonsterSummons = true;
 		        }
@@ -672,7 +672,7 @@ function identifySummonMonsterCouldBeCast(player)
 		{
 		    for (var y = 0; y < player.spells[1][2].length; y++)
 		    {
-		        if (spellList[27].equals(player.spells[1][2][y]))
+		        if ("SFW" == (player.spells[1][2][y].name))
 		        {
 		        	rightMonsterSummons = true;
 		        }
@@ -701,12 +701,24 @@ function modifyForGameType()
 	
 	if (gameTitle.match(/\(Maladroit\)/))
 	{
-		spellList[9] = new Spell("DSF", "Maladroitness");
+		spellListing["DSF"] = "Maladroitness";
 	}
 	
 	if (gameTitle.match(/\(ParaFC\)/))
 	{
-		spellList[14] = new Spell("FFF", "Paralysis (FSW --> CDP)");
+		spellListing["FFF"] = "Paralysis (FSW --> CDP)";
+	}
+	
+	if (gameTitle.match(/\(ParaFDF\)/))
+	{
+		// Make use of any updates to the name of the paralysis spell
+		spellListing["FDF"] = spellListing["FFF"];
+		spellListing["FDFD"] = spellListing["FFF"];
+		spellListing["DSFDFc"] = spellListing["DSFFFc"];
+		
+		// Remove the old paralysis and disease spells
+		delete spellListing["FFF"];
+		delete spellListing["DSFFFc"];
 	}
 }
 
