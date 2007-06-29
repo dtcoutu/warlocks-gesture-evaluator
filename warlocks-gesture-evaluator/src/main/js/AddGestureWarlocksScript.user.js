@@ -167,7 +167,7 @@ function createInputValidationScripts()
 	{
 		return;
 	}
-
+	
 	var script = document.createElement("script");
 	script.innerHTML =
 		'// Make sure inputs make sense.\n' +
@@ -945,13 +945,22 @@ function updateMonsterReferences(monsters)
 	}
 	
 	var tables = document.getElementsByTagName("table");
+	var tds = tables[tables.length-1].getElementsByTagName("td");
 
-	for (var z = 0; z < monsters.length; z++)
+	for (var x = 0; x < tds.length; x++)
 	{
-		tables[tables.length-1].innerHTML =
-			tables[tables.length-1].innerHTML.replace("Direct " + monsters[z].name,
-				"Direct " + monsters[z].nameWithOwner);
+		for (var z = 0; z < monsters.length; z++)
+		{
+			if (tds[x].firstChild.nodeValue != null)
+			{
+				tds[x].firstChild.nodeValue = 
+					tds[x].firstChild.nodeValue.replace(
+						"Direct " + monsters[z].name,
+						"Direct " + monsters[z].nameWithOwner);
+			}
+		}
 	}
+	
 }
 
 processWarlocksPage();
