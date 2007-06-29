@@ -845,11 +845,14 @@ function processWarlocksPage()
                }
                else
                {
-                   // It's a monster.
-                   monsters[monstersIndex] = new Monster(
-                       tds[0].textContent,
-                       tds[2].textContent.substr(10));
-                   monstersIndex++;
+                   // It's a monster if we have not started processing players.
+                   if (players.length == 0)
+                   {
+	                   monsters[monstersIndex] = new Monster(
+	                       tds[0].textContent,
+	                       tds[2].textContent.substr(10));
+	                   monstersIndex++;
+	               }
                }
        }
 
@@ -941,10 +944,14 @@ function updateMonsterReferences(monsters)
 	    if (x == 2) x = x + 2;
 	}
 	
-	// Get the trs that contain the monster information.
-	// They start at tr[5] and end at tr[length-3] inclusive.
-	// Note that if a creature can be summoned this round there may be up to
-	// four additional lines that we would not have monsters for.
+	var tables = document.getElementsByTagName("table");
+
+	for (var z = 0; z < monsters.length; z++)
+	{
+		tables[8].innerHTML =
+			tables[8].innerHTML.replace("Direct " + monsters[z].name,
+				"Direct " + monsters[z].nameWithOwner);
+	}
 }
 
 processWarlocksPage();
