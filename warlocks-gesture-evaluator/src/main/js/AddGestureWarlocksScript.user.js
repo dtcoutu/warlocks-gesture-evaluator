@@ -648,6 +648,32 @@ function hidePlayerGestures(table, player)
 }
 
 /*
+ * Set indicators of whether each hand could be used to cast charm monster
+ * in the next round.
+ */
+function identifyCharmMonsterCouldBeCast(player)
+{
+	var leftCharmMonster = false;
+	var rightCharmMonster = false;
+	
+	if (player.isUser)
+	{
+		if (player.spells[0].length > 3)
+		{
+			for (var x = 0; x < player.spells[0][3].length; x++)
+			{
+				if ("PSD" == (player.spells[0][3][x].name))
+				{
+				}
+			}
+		}
+		if (player.spells[1].length > 3)
+		{
+		}
+	}
+}
+
+/*
  * Set indicators of whether each hand could be used to summon a monster in
  * the next round.
  */
