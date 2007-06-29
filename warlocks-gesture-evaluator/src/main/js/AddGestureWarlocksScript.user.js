@@ -948,8 +948,8 @@ function updateMonsterReferences(monsters)
 
 	for (var z = 0; z < monsters.length; z++)
 	{
-		tables[8].innerHTML =
-			tables[8].innerHTML.replace("Direct " + monsters[z].name,
+		tables[tables.length-1].innerHTML =
+			tables[tables.length-1].innerHTML.replace("Direct " + monsters[z].name,
 				"Direct " + monsters[z].nameWithOwner);
 	}
 }
