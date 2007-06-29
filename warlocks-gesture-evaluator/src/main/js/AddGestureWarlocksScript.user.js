@@ -174,9 +174,9 @@ function createInputValidationScripts()
 		'function checkInputs(form)\n' +
 		'{\n' +
 		'  var leftHandValue = form.LH[form.LH.selectedIndex].value;\n' +
-		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].value;\n' +
+		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].text;\n' +
 		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
-		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].value;\n' +
+		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].text;\n' +
 		'  var confirmQuestion = "";\n' +
 		'\n' +
 		'  if (leftHandValue == "-")\n' +
@@ -207,6 +207,20 @@ function createInputValidationScripts()
 		'    && (rightHandTargetValue != ""))\n' +
 		'  {\n' +
 		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand (which gives the target ownership)\\n";\n' +
+		'  }\n' +
+		'\n' +
+		'  var monsterNameRegExp = new RegExp("(Goblin|Ogre|Troll|Giant)$");\n' +
+		'  if ((leftCharmMonster)\n' +
+		'    && (leftHandValue == "D")\n' +
+		'    && (!monsterNameRegExp.test(leftHandTargetValue)))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with left hand at a non-monster\\n";\n' +
+		'  }\n' +
+		'  if ((rightCharmMonster)\n' +
+		'    && (rightHandValue == "D")\n' +
+		'    && (!monsterNameRegExp.test(rightHandTargetValue)))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with right hand at a non-monster\\n";\n' +
 		'  }\n' +
 		'\n' +
 		'  if (confirmQuestion != "")\n' +
@@ -662,15 +676,28 @@ function identifyCharmMonsterCouldBeCast(player)
 		{
 			for (var x = 0; x < player.spells[0][3].length; x++)
 			{
-				if ("PSD" == (player.spells[0][3][x].name))
+				if ("PSDD" == (player.spells[0][3][x].gestures))
 				{
+					leftCharmMonster = true;
 				}
 			}
 		}
 		if (player.spells[1].length > 3)
 		{
+			for (var x = 0; x < player.spells[1][3].length; x++)
+			{
+				if ("PSDD" == (player.spells[1][3][x].gestures))
+				{
+					rightCharmMonster = true;
+				}
+			}
 		}
 	}
+
+	var script = document.createElement("script");
+	script.innerHTML = 'var leftCharmMonster = ' + leftCharmMonster + ';\n' +
+	    'var rightCharmMonster = ' + rightCharmMonster + ';\n\n';
+	document.body.insertBefore(script, document.body.firstChild);
 }
 
 /*
@@ -688,7 +715,7 @@ function identifySummonMonsterCouldBeCast(player)
 	    {
 		    for (var y = 0; y < player.spells[0][2].length; y++)
 		    {
-		        if ("SFW" == (player.spells[0][2][y].name))
+		        if ("SFW" == (player.spells[0][2][y].gestures))
 		        {
 		        	leftMonsterSummons = true;
 		        }
@@ -698,7 +725,7 @@ function identifySummonMonsterCouldBeCast(player)
 		{
 		    for (var y = 0; y < player.spells[1][2].length; y++)
 		    {
-		        if ("SFW" == (player.spells[1][2][y].name))
+		        if ("SFW" == (player.spells[1][2][y].gestures))
 		        {
 		        	rightMonsterSummons = true;
 		        }
@@ -804,6 +831,7 @@ function processWarlocksPage()
                        {
 	                       player = processPlayerHands(player);
 	                       
+	                       identifyCharmMonsterCouldBeCast(player);
 	                       identifySummonMonsterCouldBeCast(player);
 	
 	                       createSpellSection(player, tables[x]);
@@ -912,6 +940,11 @@ function updateMonsterReferences(monsters)
 	    // Need to skip over other non-target drop downs.
 	    if (x == 2) x = x + 2;
 	}
+	
+	// Get the trs that contain the monster information.
+	// They start at tr[5] and end at tr[length-3] inclusive.
+	// Note that if a creature can be summoned this round there may be up to
+	// four additional lines that we would not have monsters for.
 }
 
 processWarlocksPage();
