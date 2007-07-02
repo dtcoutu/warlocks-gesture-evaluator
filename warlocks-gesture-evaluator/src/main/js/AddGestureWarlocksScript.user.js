@@ -57,6 +57,8 @@ function Spell(gestures, name)
 	}
 }
 
+/* Variable that holds javascript to be applied to modified page. */
+var scriptToAdd = "";
 var validGesturesRegex = new RegExp("[\-|\>|\?|C|D|F|P|S|W]+");
 
 var spellListing = new Object();
@@ -153,7 +155,6 @@ function createJavaScript()
 		'      "javascript:showGestures");\n' +
 		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
         '}\n\n';
-
 	document.body.insertBefore(script, document.body.firstChild);
 }
 
@@ -170,8 +171,7 @@ function createInputValidationScripts()
 		return;
 	}
 	
-	var script = document.createElement("script");
-	script.innerHTML =
+	scriptToAdd = scriptToAdd +
 		'// Make sure inputs make sense.\n' +
 		'function checkInputs(form)\n' +
 		'{\n' +
@@ -198,13 +198,13 @@ function createInputValidationScripts()
 		'    confirmQuestion = confirmQuestion + " - clap only with right hand\\n";\n' +
 		'  }\n' +
 		'\n' +
-		'  if ((leftMonsterSummons)\n' +
+		'  if ((couldSpellsBeCast.left["SFW"])\n' +
 		'    && (leftHandValue == "W")\n' +
 		'    && (leftHandTargetValue != ""))\n' +
 		'  {\n' +
 		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand (which gives the target ownership)\\n";\n' +
 		'  }\n' +
-		'  if ((rightMonsterSummons)\n' +
+		'  if ((couldSpellsBeCast.right["SFW"])\n' +
 		'    && (rightHandValue == "W")\n' +
 		'    && (rightHandTargetValue != ""))\n' +
 		'  {\n' +
@@ -212,13 +212,13 @@ function createInputValidationScripts()
 		'  }\n' +
 		'\n' +
 		'  var monsterNameRegExp = new RegExp("(Goblin|Ogre|Troll|Giant)$");\n' +
-		'  if ((leftCharmMonster)\n' +
+		'  if ((couldSpellsBeCast.left["PSDD"])\n' +
 		'    && (leftHandValue == "D")\n' +
 		'    && (!monsterNameRegExp.test(leftHandTargetValue)))\n' +
 		'  {\n' +
 		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with left hand at a non-monster\\n";\n' +
 		'  }\n' +
-		'  if ((rightCharmMonster)\n' +
+		'  if ((couldSpellsBeCast.right["PSDD"])\n' +
 		'    && (rightHandValue == "D")\n' +
 		'    && (!monsterNameRegExp.test(rightHandTargetValue)))\n' +
 		'  {\n' +
@@ -234,7 +234,6 @@ function createInputValidationScripts()
 		'    return true;\n' +
 		'  }\n' +
 		'}\n\n';
-	document.body.insertBefore(script, document.body.firstChild);
 
     forms[0].attributes.getNamedItem('onsubmit').value = "return checkInputs(this);";
 }
@@ -664,42 +663,30 @@ function hidePlayerGestures(table, player)
 }
 
 /*
+ * Determine if spell identified by the given gestures could be cast in the
+ * next round for the user.  Modify javascript on the page being changed by
+ * this script to include a variable indicating if it could be cast or not.
+ * Further javascript would need to be added to act upon this knowledge.
+ */
+function identifyCastableSpell(spellGestures, player)
+{
+	var leftSpell = isSpellCastableByHand(spellGestures, player.spells[0]);
+	var rightSpell = isSpellCastableByHand(spellGestures, player.spells[1]);
+
+	scriptToAdd = scriptToAdd +
+		'couldSpellsBeCast.left["' + spellGestures +
+		'"] = ' + leftSpell + ';\n' +
+		'couldSpellsBeCast.right["' + spellGestures +
+		'"] = ' + rightSpell + ';\n\n';
+}
+
+/*
  * Set indicators of whether each hand could be used to cast charm monster
  * in the next round.
  */
 function identifyCharmMonsterCouldBeCast(player)
 {
-	var leftCharmMonster = false;
-	var rightCharmMonster = false;
-	
-	if (player.isUser)
-	{
-		if (player.spells[0].length > 3)
-		{
-			for (var x = 0; x < player.spells[0][3].length; x++)
-			{
-				if ("PSDD" == (player.spells[0][3][x].gestures))
-				{
-					leftCharmMonster = true;
-				}
-			}
-		}
-		if (player.spells[1].length > 3)
-		{
-			for (var x = 0; x < player.spells[1][3].length; x++)
-			{
-				if ("PSDD" == (player.spells[1][3][x].gestures))
-				{
-					rightCharmMonster = true;
-				}
-			}
-		}
-	}
-
-	var script = document.createElement("script");
-	script.innerHTML = 'var leftCharmMonster = ' + leftCharmMonster + ';\n' +
-	    'var rightCharmMonster = ' + rightCharmMonster + ';\n\n';
-	document.body.insertBefore(script, document.body.firstChild);
+	identifyCastableSpell("PSDD", player);
 }
 
 /*
@@ -708,63 +695,15 @@ function identifyCharmMonsterCouldBeCast(player)
  */
 function identifySummonMonsterCouldBeCast(player)
 {
-	var leftMonsterSummons = false;
-	var rightMonsterSummons = false;
-	
-	if (player.isUser)
-	{
-	    if (player.spells[0].length > 2)
-	    {
-		    for (var y = 0; y < player.spells[0][2].length; y++)
-		    {
-		        if ("SFW" == (player.spells[0][2][y].gestures))
-		        {
-		        	leftMonsterSummons = true;
-		        }
-		    }
-		}
-		if (player.spells[1].length > 2)
-		{
-		    for (var y = 0; y < player.spells[1][2].length; y++)
-		    {
-		        if ("SFW" == (player.spells[1][2][y].gestures))
-		        {
-		        	rightMonsterSummons = true;
-		        }
-		    }
-		}
-	}
-
-	var script = document.createElement("script");
-	script.innerHTML = 'var leftMonsterSummons = ' + leftMonsterSummons + ';\n' +
-	    'var rightMonsterSummons = ' + rightMonsterSummons + ';\n\n';
-	document.body.insertBefore(script, document.body.firstChild);
+	identifyCastableSpell("SFW", player);
 }
 
 /*
- * Determine if spell identified by the given gestures could be cast in the
- * next round for the user.  Modify javascript on the page being changed by
- * this script to include a variable indicating if it could be cast or not.
- * Further javascript would need to be added to act upon this knowledge.
+ * Return true if the given character is lower case, otherwise false.
  */
-function couldSpellBeCast(spellGestures, player)
+function isLowerCase(character)
 {
-	var leftSpell = false;
-	var rightSpell = false;
-	
-	if (player.isUser)
-	{
-		leftSpell = couldSpellBeCastByHand(spellGestures, player.spells[0]);
-		rightSpell = couldSpellBeCastByHand(spellGestures, player.spells[1]);
-		
-		var script = document.createElement("script");
-		script.innerHTML =
-			'couldSpellsBeCast.left[' + spellGestures +
-			'] = ' + leftSpell + ';\n' +
-			'couldSpellsBeCast.right[' + spellGestures +
-			'] = ' + rightSpell + ';\n\n';
-		document.body.insertBefore(script, document.body.firstChild);
-	}
+	return ((character >= 'a') && (character <= 'z'));
 }
 
 /*
@@ -772,7 +711,7 @@ function couldSpellBeCast(spellGestures, player)
  * next round using the given spells that could be completed for a single hand.
  * Return true if the spell could be completed, otherwise false.
  */
-function couldSpellBeCastByHand(spellGestures, handSpells)
+function isSpellCastableByHand(spellGestures, handSpells)
 {
 	var couldCompleteSpell = false;
 	var penultimateGestureCount = spellGestures.length - 1;
@@ -784,7 +723,7 @@ function couldSpellBeCastByHand(spellGestures, handSpells)
 				&& !couldCompleteSpell;
 			x++)
 		{
-			if (spellGestures == handSpells[penultimateGestureCount][x].gestures))
+			if (spellGestures == handSpells[penultimateGestureCount][x].gestures)
 			{
 				couldCompleteSpell = true;
 			}
@@ -792,14 +731,6 @@ function couldSpellBeCastByHand(spellGestures, handSpells)
 	}
 	
 	return couldCompleteSpell;
-}
-
-/*
- * Return true if the given character is lower case, otherwise false.
- */
-function isLowerCase(character)
-{
-	return ((character >= 'a') && (character <= 'z'));
 }
 
 function modifyForGameType()
@@ -831,6 +762,25 @@ function modifyForGameType()
 }
 
 /*
+ * Setup the ground work for determing what spells could be cast and the
+ * validation desired if they can be.
+ */
+function processCastableSpells(player)
+{
+	if (player.isUser)
+	{
+		scriptToAdd = scriptToAdd +
+			'var couldSpellsBeCast = new Object();\n' +
+			'couldSpellsBeCast.left = new Object();\n' +
+			'couldSpellsBeCast.right = new Object();\n\n';
+
+		identifyCharmMonsterCouldBeCast(player);
+		//identifyResistFireCouldBeCast(player);
+		identifySummonMonsterCouldBeCast(player);
+	}
+}
+
+/*
  * Given a single player evaluate the gestures they are working on and update
  * the player with a list of spells for each hand.
  */
@@ -852,9 +802,6 @@ function processPlayerHands(player)
 
 function processWarlocksPage()
 {
-       createJavaScript();
-       createInputValidationScripts();
-
        var players = new Array();
        var playersIndex = 0;
        var monsters = new Array();
@@ -867,7 +814,6 @@ function processWarlocksPage()
        userName = userName.substr(8);
        
        modifyForGameType();
-
        // Skip over the next two tables since those contain navigation stuff.
        for (var x=3; x < tables.length; x++)
        {
@@ -886,8 +832,7 @@ function processWarlocksPage()
                        {
 	                       player = processPlayerHands(player);
 	                       
-	                       identifyCharmMonsterCouldBeCast(player);
-	                       identifySummonMonsterCouldBeCast(player);
+	                       processCastableSpells(player);
 	
 	                       createSpellSection(player, tables[x]);
 	                       // Increment one to skip over table created for spell section.
@@ -912,7 +857,14 @@ function processWarlocksPage()
        }
 
        updateMonsterReferences(monsters);
-       setSpellTableStyle();
+	createJavaScript();
+	createInputValidationScripts();
+	var script = document.createElement("script");
+	script.innerHTML = scriptToAdd;
+	document.body.insertBefore(script, document.body.firstChild);
+
+	setSpellTableStyle();
+
 }
 
 /*
