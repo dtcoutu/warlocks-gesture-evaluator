@@ -31,6 +31,8 @@ function Monster(name, owner)
     this.owner = owner;
 }
 
+// TODO: Change hands and spells from arrays to leftGestures, rightGestures
+// and leftSpells and rightSpells.
 function Player(name, leftHand, rightHand)
 {
 	this.hands = new Array(2);
@@ -737,6 +739,59 @@ function identifySummonMonsterCouldBeCast(player)
 	script.innerHTML = 'var leftMonsterSummons = ' + leftMonsterSummons + ';\n' +
 	    'var rightMonsterSummons = ' + rightMonsterSummons + ';\n\n';
 	document.body.insertBefore(script, document.body.firstChild);
+}
+
+/*
+ * Determine if spell identified by the given gestures could be cast in the
+ * next round for the user.  Modify javascript on the page being changed by
+ * this script to include a variable indicating if it could be cast or not.
+ * Further javascript would need to be added to act upon this knowledge.
+ */
+function couldSpellBeCast(spellGestures, player)
+{
+	var leftSpell = false;
+	var rightSpell = false;
+	
+	if (player.isUser)
+	{
+		leftSpell = couldSpellBeCastByHand(spellGestures, player.spells[0]);
+		rightSpell = couldSpellBeCastByHand(spellGestures, player.spells[1]);
+		
+		var script = document.createElement("script");
+		script.innerHTML =
+			'couldSpellsBeCast.left[' + spellGestures +
+			'] = ' + leftSpell + ';\n' +
+			'couldSpellsBeCast.right[' + spellGestures +
+			'] = ' + rightSpell + ';\n\n';
+		document.body.insertBefore(script, document.body.firstChild);
+	}
+}
+
+/*
+ * Determine if the spell identified by the given gestures could be cast in the
+ * next round using the given spells that could be completed for a single hand.
+ * Return true if the spell could be completed, otherwise false.
+ */
+function couldSpellBeCastByHand(spellGestures, handSpells)
+{
+	var couldCompleteSpell = false;
+	var penultimateGestureCount = spellGestures.length - 1;
+	
+	if (handSpells.length > penultimateGestureCount)
+	{
+		for (var x = 0;
+			x < handSpells[penultimateGestureCount].length
+				&& !couldCompleteSpell;
+			x++)
+		{
+			if (spellGestures == handSpells[penultimateGestureCount][x].gestures))
+			{
+				couldCompleteSpell = true;
+			}
+		}
+	}
+	
+	return couldCompleteSpell;
 }
 
 /*
