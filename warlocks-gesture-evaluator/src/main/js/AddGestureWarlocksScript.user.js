@@ -929,9 +929,6 @@ function trimInvalidGestures(gestures)
  */
 function updateMonsterReferences(monsters)
 {
-       // modify monster's in target drop downs.
-       // remember when a monster could possibly be summoned an additional
-       // target drop down will appear.
 	var dropDowns = document.getElementsByTagName("select");
 	
 	for (var x = 2; x < dropDowns.length; x++)
@@ -951,23 +948,26 @@ function updateMonsterReferences(monsters)
 	    if (x == 2) x = x + 2;
 	}
 	
-	var tables = document.getElementsByTagName("table");
-	var tds = tables[tables.length-1].getElementsByTagName("td");
-
-	for (var x = 0; x < tds.length; x++)
+	if (dropDowns.length > 0)
 	{
-		for (var z = 0; z < monsters.length; z++)
+		var tables = document.getElementsByTagName("table");
+		var tds = tables[tables.length-1].getElementsByTagName("td");
+	
+		for (var x = 0; x < tds.length; x++)
 		{
-			if (tds[x].firstChild.nodeValue != null)
+			for (var z = 0; z < monsters.length; z++)
 			{
-				tds[x].firstChild.nodeValue = 
-					tds[x].firstChild.nodeValue.replace(
-						"Direct " + monsters[z].name,
-						"Direct " + monsters[z].nameWithOwner);
+				if ((tds[x].firstChild != null) &&
+					(tds[x].firstChild.nodeValue != null))
+				{
+					tds[x].firstChild.nodeValue = 
+						tds[x].firstChild.nodeValue.replace(
+							"Direct " + monsters[z].name,
+							"Direct " + monsters[z].nameWithOwner);
+				}
 			}
 		}
-	}
-	
+	}	
 }
 
 processWarlocksPage();
