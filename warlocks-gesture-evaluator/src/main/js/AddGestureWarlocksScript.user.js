@@ -261,7 +261,7 @@ function createSpellElements(spells, submittedGestures)
 		currentSpell = spells[0][x];
 		spellCell = document.createElement("td");
 		var cellText = document.createTextNode(
-			currentSpell.gestures + ": " + currentSpell.name);
+			currentSpell.gestures + ": ");
 
 		if (submittedGestures)
 		{
@@ -272,6 +272,7 @@ function createSpellElements(spells, submittedGestures)
 			spellCell.className = "complete";
 		}
 		spellCell.appendChild(cellText);
+		spellCell.appendChild(createSpellNameAnchor(currentSpell.name));
 
 		cellArray[cellCount] = spellCell;
 	}
@@ -318,6 +319,21 @@ function createSpellElements(spells, submittedGestures)
 	}
 
 	return cellArray;
+}
+
+/*
+ * Create the HTML anchor tag with the spell name linked to the description
+ * provided on the Warlocks site.
+ */
+function createSpellNameAnchor(spellName)
+{
+	var anchor = document.createElement("a");
+	anchor.href = "http://games.ravenblack.net/rules/1/spells.html#" +
+		removeToken(spellName, " ");
+	anchor.target = "_blank";
+	anchor.appendChild(document.createTextNode(spellName));
+	
+	return anchor;
 }
 
 /*
@@ -887,6 +903,26 @@ function removePreviouslyMatchedSpells(matchedSpell, previouslyMatched)
 	
 	return matchedSpells;
 }
+
+/*
+ *  Remove all occurrences of a token in a string
+ *    input  string to be processed
+ *    token  token to be removed
+ *  returns new string
+ */
+function removeToken(input, token)
+{
+	index = input.indexOf(token);
+	result = "";
+	if (index == -1)
+	{
+		return input;
+	}
+	result += input.substring(0,index) +
+		removeToken(input.substring(index + token.length), token);
+
+	return result;
+}	
 
 function setSpellTableStyle()
 {
