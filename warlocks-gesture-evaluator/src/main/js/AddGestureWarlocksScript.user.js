@@ -170,14 +170,18 @@ function createInputValidationScripts()
 	{
 		return;
 	}
+
+    forms[0].attributes.getNamedItem('onsubmit').value = "return checkInputs(this);";
 	
 	scriptToAdd = scriptToAdd +
 		'// Make sure inputs make sense.\n' +
 		'function checkInputs(form)\n' +
 		'{\n' +
 		'  var leftHandValue = form.LH[form.LH.selectedIndex].value;\n' +
+		'  var leftHandSpellValue = form.LHS[form.LHS.selectedIndex].value;\n' +
 		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].text;\n' +
 		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
+		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
 		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].text;\n' +
 		'  var confirmQuestion = "";\n' +
 		'\n' +
@@ -225,6 +229,19 @@ function createInputValidationScripts()
 		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with right hand at a non-monster\\n";\n' +
 		'  }\n' +
 		'\n' +
+		'  if ((couldSpellsBeCast.left["WWFP"])\n' +
+		'    && (leftHandValue == "P")\n' +
+		'    && (leftHandSpellValue != "Cause Light Wounds"))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - cast Resist Fire with your left hand, did you mean Cause Light Wounds?\\n";\n' +
+		'  }\n' +
+		'  if ((couldSpellsBeCast.right["WWFP"])\n' +
+		'    && (rightHandValue == "P")\n' +
+		'    && (rightHandSpellValue != "Cause Light Wounds"))\n' +
+		'  {\n' +
+		'    confirmQuestion = confirmQuestion + " - cast Resist Fire with your right hand, did you mean Cause Light Wounds?\\n";\n' +
+		'  }\n' +
+		'\n' +
 		'  if (confirmQuestion != "")\n' +
 		'  {\n' +
 		'    return confirm("Are you sure you want to:\\n" + confirmQuestion);\n' +
@@ -234,8 +251,6 @@ function createInputValidationScripts()
 		'    return true;\n' +
 		'  }\n' +
 		'}\n\n';
-
-    forms[0].attributes.getNamedItem('onsubmit').value = "return checkInputs(this);";
 }
 
 /*
@@ -708,6 +723,15 @@ function identifyCharmMonsterCouldBeCast(player)
 }
 
 /*
+ * Set indicateors of whether each hand could be used to cast resist fire
+ * in the next round.
+ */
+function identifyResistFireCouldBeCast(player)
+{
+	identifyCastableSpell("WWFP", player);
+}
+
+/*
  * Set indicators of whether each hand could be used to summon a monster in
  * the next round.
  */
@@ -793,7 +817,7 @@ function processCastableSpells(player)
 			'couldSpellsBeCast.right = new Object();\n\n';
 
 		identifyCharmMonsterCouldBeCast(player);
-		//identifyResistFireCouldBeCast(player);
+		identifyResistFireCouldBeCast(player);
 		identifySummonMonsterCouldBeCast(player);
 	}
 }
