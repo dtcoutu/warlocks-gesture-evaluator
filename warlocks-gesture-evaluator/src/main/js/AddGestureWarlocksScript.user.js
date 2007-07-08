@@ -23,6 +23,9 @@
 // Expects value of "none", "user" or "all" and indicates what spell lists will
 // start expanded.
 var defaultSpellListDisplay = "none";
+// Indicate whether to disable (false) or enable (true) validation check regarding
+// whether Cause Light Wounds was desired instead of Resist Fire.
+var enableResistFireValidation = true;
 
 function Monster(name, owner)
 {
@@ -59,6 +62,7 @@ function Spell(gestures, name)
 
 /* Variable that holds javascript to be applied to modified page. */
 var scriptToAdd = "";
+var validationChecks = new Object();
 var validGesturesRegex = new RegExp("[\-|\>|\?|C|D|F|P|S|W]+");
 
 var spellListing = new Object();
@@ -184,67 +188,103 @@ function createInputValidationScripts()
 		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
 		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].text;\n' +
 		'  var confirmQuestion = "";\n' +
+		'  var leftHandConfirmQuestions = "";\n' +
+		'  var rightHandConfirmQuestions = "";\n' +
 		'\n' +
 		'  if (leftHandValue == "-")\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - do no gesture with left hand\\n";\n' +
+		'    leftHandConfirmQuestions = leftHandConfirmQuestions + "    - do no gesture with left hand\\n";\n' +
 		'  }\n' +
 		'  if ((leftHandValue == "C") && (rightHandValue != "C"))\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - clap only with left hand\\n";\n' +
-		'  }\n' +
+		'    leftHandConfirmQuestions = leftHandConfirmQuestions + "    - clap only with left hand\\n";\n' +
+		'  }\n'
+		'\n';
+
+	// loop through validation checks for left hand
+	for (var check in validationChecks)
+	{
+		scriptToAdd = scriptToAdd +
+			'  if ((couldSpellsBeCast.left["' + check + '"])\n' +
+			'    && (leftHandValue == "' + validationChecks[check].gesture + '")';
+		if (validationChecks[check].spellValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (leftHandSpellValue != ' +
+				validationChecks[check].spellValue + ')';
+		}
+		
+		if (validationChecks[check].targetValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (!leftHandTargetValue.match(' +
+				validationChecks[check].targetValue + '))';
+		}
+		
+		scriptToAdd = scriptToAdd +
+		    ')\n' +	
+			'  {\n' +
+			'    leftHandConfirmQuestions = leftHandConfirmQuestions + "' +
+			'    - ' +
+			validationChecks[check].confirmQuestion + '\\n";\n' +
+			'  }\n' +
+			'\n';
+	}
+
+	scriptToAdd = scriptToAdd +
 		'  if (rightHandValue == "-")\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - do no gesture with right hand\\n";\n' +
+		'    rightHandConfirmQuestions = rightHandConfirmQuestions + "    - do no gesture with right hand\\n";\n' +
 		'  }\n' +
 		'  if ((rightHandValue == "C") && (leftHandValue != "C"))\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - clap only with right hand\\n";\n' +
+		'    rightHandConfirmQuestions = rightHandConfirmQuestions + "    - clap only with right hand\\n";\n' +
 		'  }\n' +
+		'\n';
+	
+	// loop through validation checks for right hand
+	for (var check in validationChecks)
+	{
+		scriptToAdd = scriptToAdd +
+			'  if ((couldSpellsBeCast.right["' + check + '"])\n' +
+			'    && (rightHandValue == "' + validationChecks[check].gesture + '")';
+		if (validationChecks[check].spellValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (rightHandSpellValue != ' +
+				validationChecks[check].spellValue + ')';
+		}
+		
+		if (validationChecks[check].targetValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (!rightHandTargetValue.match(' +
+				validationChecks[check].targetValue + '))';
+		}
+		
+		scriptToAdd = scriptToAdd +
+		    ')\n' +	
+			'  {\n' +
+			'    rightHandConfirmQuestions = rightHandConfirmQuestions + "' +
+			'    - ' +
+			validationChecks[check].confirmQuestion + '\\n";\n' +
+			'  }\n' +
+			'\n';
+	}
+
+	scriptToAdd = scriptToAdd +
 		'\n' +
-		'  if ((couldSpellsBeCast.left["SFW"])\n' +
-		'    && (leftHandValue == "W")\n' +
-		'    && (leftHandTargetValue != ""))\n' +
+		'  if ((leftHandConfirmQuestions != "") || (rightHandConfirmQuestions != ""))\n' +
 		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a summon spell with left hand (which gives the target ownership)\\n";\n' +
-		'  }\n' +
-		'  if ((couldSpellsBeCast.right["SFW"])\n' +
-		'    && (rightHandValue == "W")\n' +
-		'    && (rightHandTargetValue != ""))\n' +
-		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a summon spell with right hand (which gives the target ownership)\\n";\n' +
-		'  }\n' +
-		'\n' +
-		'  var monsterNameRegExp = new RegExp("(Goblin|Ogre|Troll|Giant)$");\n' +
-		'  if ((couldSpellsBeCast.left["PSDD"])\n' +
-		'    && (leftHandValue == "D")\n' +
-		'    && (!monsterNameRegExp.test(leftHandTargetValue)))\n' +
-		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with left hand at a non-monster\\n";\n' +
-		'  }\n' +
-		'  if ((couldSpellsBeCast.right["PSDD"])\n' +
-		'    && (rightHandValue == "D")\n' +
-		'    && (!monsterNameRegExp.test(rightHandTargetValue)))\n' +
-		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - target a charm monster spell with right hand at a non-monster\\n";\n' +
-		'  }\n' +
-		'\n' +
-		'  if ((couldSpellsBeCast.left["WWFP"])\n' +
-		'    && (leftHandValue == "P")\n' +
-		'    && (leftHandSpellValue != "Cause Light Wounds"))\n' +
-		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - cast Resist Fire with your left hand, did you mean Cause Light Wounds?\\n";\n' +
-		'  }\n' +
-		'  if ((couldSpellsBeCast.right["WWFP"])\n' +
-		'    && (rightHandValue == "P")\n' +
-		'    && (rightHandSpellValue != "Cause Light Wounds"))\n' +
-		'  {\n' +
-		'    confirmQuestion = confirmQuestion + " - cast Resist Fire with your right hand, did you mean Cause Light Wounds?\\n";\n' +
-		'  }\n' +
-		'\n' +
-		'  if (confirmQuestion != "")\n' +
-		'  {\n' +
-		'    return confirm("Are you sure you want to:\\n" + confirmQuestion);\n' +
+		'    if (leftHandConfirmQuestions != "")\n' +
+		'    {\n' +
+		'      leftHandConfirmQuestions = "  with your left hand:\\n" + leftHandConfirmQuestions;\n' +
+		'    }\n' +
+		'    if (rightHandConfirmQuestions != "")\n' +
+		'    {\n' +
+		'      rightHandConfirmQuestions = "  with your right hand:\\n" + rightHandConfirmQuestions;\n' +
+		'    }\n' +
+		'    return confirm("Are you sure you want to:\\n" + leftHandConfirmQuestions + rightHandConfirmQuestions);\n' +
 		'  }\n' +
 		'  else\n' +
 		'  {\n' +
@@ -711,6 +751,8 @@ function identifyCastableSpell(spellGestures, player)
 		'"] = ' + leftSpell + ';\n' +
 		'couldSpellsBeCast.right["' + spellGestures +
 		'"] = ' + rightSpell + ';\n\n';
+	
+	return (leftSpell || rightSpell);
 }
 
 /*
@@ -719,7 +761,14 @@ function identifyCastableSpell(spellGestures, player)
  */
 function identifyCharmMonsterCouldBeCast(player)
 {
-	identifyCastableSpell("PSDD", player);
+	var charmMonsterGestures = "PSDD";
+
+	identifyCastableSpell(charmMonsterGestures, player);
+	
+	validationChecks[charmMonsterGestures] = new Object();
+	validationChecks[charmMonsterGestures].gesture = "D";
+	validationChecks[charmMonsterGestures].targetValue = "/(Goblin|Ogre|Troll|Giant)$/";
+	validationChecks[charmMonsterGestures].confirmQuestion = "target a charm monster spell at a non-monster";
 }
 
 /*
@@ -728,7 +777,17 @@ function identifyCharmMonsterCouldBeCast(player)
  */
 function identifyResistFireCouldBeCast(player)
 {
-	identifyCastableSpell("WWFP", player);
+	if (enableResistFireValidation)
+	{
+		var resistFireGestures = "WWFP";
+		
+		identifyCastableSpell(resistFireGestures, player);
+		
+		validationChecks[resistFireGestures] = new Object();
+		validationChecks[resistFireGestures].gesture = "P";
+		validationChecks[resistFireGestures].spellValue = "/Cause Light Wounds/";
+		validationChecks[resistFireGestures].confirmQuestion = "cast Resist Fire instead of Cause Light Wounds";
+	}
 }
 
 /*
@@ -737,7 +796,14 @@ function identifyResistFireCouldBeCast(player)
  */
 function identifySummonMonsterCouldBeCast(player)
 {
-	identifyCastableSpell("SFW", player);
+	var summonGoblinGestures = "SFW";
+	
+	identifyCastableSpell(summonGoblinGestures, player);
+	
+	validationChecks[summonGoblinGestures] = new Object();
+	validationChecks[summonGoblinGestures].gesture = "W";
+	validationChecks[summonGoblinGestures].targetValue = "/^$/";
+	validationChecks[summonGoblinGestures].confirmQuestion = "target a summon monster spell which gives control to target";
 }
 
 /*
