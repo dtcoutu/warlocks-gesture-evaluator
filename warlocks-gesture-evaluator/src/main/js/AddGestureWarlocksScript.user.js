@@ -306,13 +306,14 @@ function createSpellElements(spells, submittedGestures)
 			}
 			
 			cellText = document.createTextNode(
-				currentSpell.gestures.substr(i) + ": " + currentSpell.name);
+				currentSpell.gestures.substr(i) + ": ");
 
 			if ((cellCount % 2) == 1)
 			{
 				spellCell.className = "alt";
 			}
 			spellCell.appendChild(cellText);
+			spellCell.appendChild(createSpellNameAnchor(currentSpell.name));
 
 			cellArray[cellCount] = spellCell;
 		}
@@ -328,8 +329,9 @@ function createSpellElements(spells, submittedGestures)
 function createSpellNameAnchor(spellName)
 {
 	var anchor = document.createElement("a");
+	var spellNameAnchor = spellName.replace(/\(.*\)/, " ");
 	anchor.href = "http://games.ravenblack.net/rules/1/spells.html#" +
-		removeToken(spellName, " ");
+		removeToken(spellNameAnchor, " ");
 	anchor.target = "_blank";
 	anchor.appendChild(document.createTextNode(spellName));
 	
@@ -926,17 +928,21 @@ function removeToken(input, token)
 
 function setSpellTableStyle()
 {
-       if (GM_addStyle)
-       {
-               // These only work in greasemonkey - not good for testing...
-               GM_addStyle("#spellSection td { padding-right: 6px; }");
-               GM_addStyle("#spellSection .alt { color: #AAAAAA; }");
-               GM_addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
-               GM_addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italics; }");
-               GM_addStyle("#spellSection th { font-size: smaller; }");
-               GM_addStyle("#spellSection strong { color: tomato; }");
-               GM_addStyle("#spellSection em { color: yellow; font-weight: bold; }");
-       }
+	if (GM_addStyle)
+	{
+		// These only work in greasemonkey - not good for testing...
+		GM_addStyle("#spellSection td { padding-right: 6px; }");
+		GM_addStyle("#spellSection .alt { color: #AAAAAA; }");
+		GM_addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
+		GM_addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italics; }");
+		GM_addStyle("#spellSection th { font-size: smaller; }");
+		GM_addStyle("#spellSection strong { color: tomato; }");
+		GM_addStyle("#spellSection em { color: yellow; font-weight: bold; }");
+		GM_addStyle("#spellSection a { color: #FFFFFF; text-decoration: underline; }");
+		GM_addStyle("#spellSection .alt a { color: #AAAAAA; }");
+		GM_addStyle("#spellSection .complete a { color: #88FF88; font-weight: bold; }");
+		GM_addStyle("#spellSection .submittedComplete a { color: yellow; font-weight: bold; font-style: italics; }");
+	}
 }
 
 /*
