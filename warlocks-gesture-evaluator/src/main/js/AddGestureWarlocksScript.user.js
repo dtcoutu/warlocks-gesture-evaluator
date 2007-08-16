@@ -767,7 +767,7 @@ function identifyCharmMonsterCouldBeCast(player)
 	
 	validationChecks[charmMonsterGestures] = new Object();
 	validationChecks[charmMonsterGestures].gesture = "D";
-	validationChecks[charmMonsterGestures].targetValue = "/(Goblin|Ogre|Troll|Giant)$/";
+	validationChecks[charmMonsterGestures].targetValue = "/((^(RH:|LH:))|((Goblin|Ogre|Troll|Giant)$))/";
 	validationChecks[charmMonsterGestures].confirmQuestion = "target a charm monster spell at a non-monster";
 }
 
