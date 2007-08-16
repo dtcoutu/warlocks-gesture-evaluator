@@ -217,17 +217,22 @@ function createInputValidationScripts()
 		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
 		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
 		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].text;\n' +
-		'  var confirmQuestion = "";\n' +
+		'  var bothHandConfirmQuestions = "";\n' +
 		'  var leftHandConfirmQuestions = "";\n' +
 		'  var rightHandConfirmQuestions = "";\n' +
 		'\n' +
+		'  if ((leftHandValue == "P") && (rightHandValue == "P"))\n' +
+		'  {\n' +
+		'    bothHandConfirmQuestions += "  Surrender the match!\\n";\n' +
+		'  }\n' +
+		'\n' +
 		'  if (leftHandValue == "-")\n' +
 		'  {\n' +
-		'    leftHandConfirmQuestions = leftHandConfirmQuestions + "    - do no gesture with left hand\\n";\n' +
+		'    leftHandConfirmQuestions += "    - do no gesture with left hand\\n";\n' +
 		'  }\n' +
 		'  if ((leftHandValue == "C") && (rightHandValue != "C"))\n' +
 		'  {\n' +
-		'    leftHandConfirmQuestions = leftHandConfirmQuestions + "    - clap only with left hand\\n";\n' +
+		'    leftHandConfirmQuestions += "    - clap only with left hand\\n";\n' +
 		'  }\n'
 		'\n';
 
@@ -254,7 +259,7 @@ function createInputValidationScripts()
 		scriptToAdd = scriptToAdd +
 		    ')\n' +	
 			'  {\n' +
-			'    leftHandConfirmQuestions = leftHandConfirmQuestions + "' +
+			'    leftHandConfirmQuestions += "' +
 			'    - ' +
 			validationChecks[check].confirmQuestion + '\\n";\n' +
 			'  }\n' +
@@ -264,11 +269,11 @@ function createInputValidationScripts()
 	scriptToAdd = scriptToAdd +
 		'  if (rightHandValue == "-")\n' +
 		'  {\n' +
-		'    rightHandConfirmQuestions = rightHandConfirmQuestions + "    - do no gesture with right hand\\n";\n' +
+		'    rightHandConfirmQuestions += "    - do no gesture with right hand\\n";\n' +
 		'  }\n' +
 		'  if ((rightHandValue == "C") && (leftHandValue != "C"))\n' +
 		'  {\n' +
-		'    rightHandConfirmQuestions = rightHandConfirmQuestions + "    - clap only with right hand\\n";\n' +
+		'    rightHandConfirmQuestions += "    - clap only with right hand\\n";\n' +
 		'  }\n' +
 		'\n';
 	
@@ -295,7 +300,7 @@ function createInputValidationScripts()
 		scriptToAdd = scriptToAdd +
 		    ')\n' +	
 			'  {\n' +
-			'    rightHandConfirmQuestions = rightHandConfirmQuestions + "' +
+			'    rightHandConfirmQuestions += "' +
 			'    - ' +
 			validationChecks[check].confirmQuestion + '\\n";\n' +
 			'  }\n' +
@@ -304,7 +309,7 @@ function createInputValidationScripts()
 
 	scriptToAdd = scriptToAdd +
 		'\n' +
-		'  if ((leftHandConfirmQuestions != "") || (rightHandConfirmQuestions != ""))\n' +
+		'  if ((leftHandConfirmQuestions != "") || (rightHandConfirmQuestions != "") || (bothHandConfirmQuestions != ""))\n' +
 		'  {\n' +
 		'    if (leftHandConfirmQuestions != "")\n' +
 		'    {\n' +
@@ -314,7 +319,7 @@ function createInputValidationScripts()
 		'    {\n' +
 		'      rightHandConfirmQuestions = "  with your right hand:\\n" + rightHandConfirmQuestions;\n' +
 		'    }\n' +
-		'    return confirm("Are you sure you want to:\\n" + leftHandConfirmQuestions + rightHandConfirmQuestions);\n' +
+		'    return confirm("Are you sure you want to:\\n" + bothHandConfirmQuestions + leftHandConfirmQuestions + rightHandConfirmQuestions);\n' +
 		'  }\n' +
 		'  else\n' +
 		'  {\n' +
