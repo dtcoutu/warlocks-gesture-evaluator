@@ -112,6 +112,36 @@ spellListing["WWP"] = "Protection";
 spellListing["WWS"] = "Counter Spell";
 
 /*
+ * Make the given string camel-cased by removing any spaces and capitalizing
+ * any character following the removed space.
+ */
+function camelize(input)
+{
+	var token = " ";
+	index = input.indexOf(token);
+	result = "";
+	if (index == -1)
+	{
+		return input;
+	}
+	result += input.substring(0, index);
+	
+	var nextIndex = index + token.length;
+	
+	if (input.substring(nextIndex, nextIndex + 1).match(/\s/))
+	{
+		result += camelize(input.substring(nextIndex));
+	}
+	else
+	{
+		result += input.substring(nextIndex, nextIndex + 1).toUpperCase() +
+			camelize(input.substring(nextIndex + 1));
+	}
+
+	return result;
+}
+
+/*
  * Creates the javascript to be used by the program after the greasemonkey
  * script finishes.
  */
@@ -384,9 +414,9 @@ function createSpellElements(spells, submittedGestures)
 function createSpellNameAnchor(spellName)
 {
 	var anchor = document.createElement("a");
-	var spellNameAnchor = spellName.replace(/\(.*\)/, " ");
+	var spellNameAnchor = spellName.replace(/(\(.*\)|[^a-zA-Z])/g, " ");
 	anchor.href = "http://games.ravenblack.net/rules/1/spells.html#" +
-		removeToken(spellNameAnchor, " ");
+		camelize(spellNameAnchor);
 	anchor.target = "_blank";
 	anchor.appendChild(document.createTextNode(spellName));
 	
