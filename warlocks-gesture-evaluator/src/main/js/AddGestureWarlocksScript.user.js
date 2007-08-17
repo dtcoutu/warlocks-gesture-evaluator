@@ -24,8 +24,8 @@
 // start expanded.
 var defaultSpellListDisplay = "none";
 // Indicate whether to disable (false) or enable (true) validation check regarding
-// whether Cause Light Wounds was desired instead of Resist Fire.
-var enableResistFireValidation = true;
+// whether Cause Light Wounds was desired instead of Resist Heat.
+var enableResistHeatValidation = true;
 
 function Monster(name, owner)
 {
@@ -245,8 +245,8 @@ function createInputValidationScripts()
 		if (validationChecks[check].spellValue != undefined)
 		{
 			scriptToAdd = scriptToAdd +
-				'\n    && (leftHandSpellValue != ' +
-				validationChecks[check].spellValue + ')';
+				'\n    && (leftHandSpellValue != "' +
+				validationChecks[check].spellValue + '")';
 		}
 		
 		if (validationChecks[check].targetValue != undefined)
@@ -286,8 +286,8 @@ function createInputValidationScripts()
 		if (validationChecks[check].spellValue != undefined)
 		{
 			scriptToAdd = scriptToAdd +
-				'\n    && (rightHandSpellValue != ' +
-				validationChecks[check].spellValue + ')';
+				'\n    && (rightHandSpellValue != "' +
+				validationChecks[check].spellValue + '")';
 		}
 		
 		if (validationChecks[check].targetValue != undefined)
@@ -810,9 +810,9 @@ function identifyCharmMonsterCouldBeCast(player)
  * Set indicateors of whether each hand could be used to cast resist fire
  * in the next round.
  */
-function identifyResistFireCouldBeCast(player)
+function identifyResistHeatCouldBeCast(player)
 {
-	if (enableResistFireValidation)
+	if (enableResistHeatValidation)
 	{
 		var resistFireGestures = "WWFP";
 		
@@ -820,8 +820,8 @@ function identifyResistFireCouldBeCast(player)
 		
 		validationChecks[resistFireGestures] = new Object();
 		validationChecks[resistFireGestures].gesture = "P";
-		validationChecks[resistFireGestures].spellValue = "/Cause Light Wounds/";
-		validationChecks[resistFireGestures].confirmQuestion = "cast Resist Fire instead of Cause Light Wounds";
+		validationChecks[resistFireGestures].spellValue = "Cause Light Wounds";
+		validationChecks[resistFireGestures].confirmQuestion = "cast Resist Heat instead of Cause Light Wounds";
 	}
 }
 
@@ -918,7 +918,7 @@ function processCastableSpells(player)
 			'couldSpellsBeCast.right = new Object();\n\n';
 
 		identifyCharmMonsterCouldBeCast(player);
-		identifyResistFireCouldBeCast(player);
+		identifyResistHeatCouldBeCast(player);
 		identifySummonMonsterCouldBeCast(player);
 	}
 }
