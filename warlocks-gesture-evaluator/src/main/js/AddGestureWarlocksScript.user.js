@@ -213,10 +213,10 @@ function createInputValidationScripts()
 		'{\n' +
 		'  var leftHandValue = form.LH[form.LH.selectedIndex].value;\n' +
 		'  var leftHandSpellValue = form.LHS[form.LHS.selectedIndex].value;\n' +
-		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].text;\n' +
+		'  var leftHandTargetValue = form.LHT[form.LHT.selectedIndex].value;\n' +
 		'  var rightHandValue = form.RH[form.RH.selectedIndex].value;\n' +
 		'  var rightHandSpellValue = form.RHS[form.RHS.selectedIndex].value;\n' +
-		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].text;\n' +
+		'  var rightHandTargetValue = form.RHT[form.RHT.selectedIndex].value;\n' +
 		'  var bothHandConfirmQuestions = "";\n' +
 		'  var leftHandConfirmQuestions = "";\n' +
 		'  var rightHandConfirmQuestions = "";\n' +
@@ -233,7 +233,20 @@ function createInputValidationScripts()
 		'  if ((leftHandValue == "C") && (rightHandValue != "C"))\n' +
 		'  {\n' +
 		'    leftHandConfirmQuestions += "    - clap only with left hand\\n";\n' +
-		'  }\n'
+		'  }\n' +
+		'\n' +
+		'  if ((couldSpellsBeCast.left["PSDD"])\n' +
+		'    && (leftHandValue == "D"))\n' +
+		'  {\n' +
+		'    // Assumption is that if no elements are found the targetting is not right\n' +
+		'    // so let the charm monster targeting check catch it.\n' +
+		'    var elements = document.getElementsByName(leftHandTargetValue);\n' +
+		'    if ((elements.length > 0)\n' +
+		'      && (elements[0].options[elements[0].selectedIndex].value == ""))\n' +
+		'    {\n' +
+		'      leftHandConfirmQuestions += "    - not direct the attack of the monster you are charming\\n";\n' +
+		'    }\n' +
+		'  }\n' +
 		'\n';
 
 	// loop through validation checks for left hand
@@ -274,6 +287,20 @@ function createInputValidationScripts()
 		'  if ((rightHandValue == "C") && (leftHandValue != "C"))\n' +
 		'  {\n' +
 		'    rightHandConfirmQuestions += "    - clap only with right hand\\n";\n' +
+		'  }\n' +
+		'\n' +
+		'  if ((couldSpellsBeCast.right["PSDD"])\n' +
+		'    && (rightHandValue == "D")\n' +
+		'    && (rightHandTargetValue != ""))\n' +
+		'  {\n' +
+		'    // Assumption is that if no elements are found the targetting is not right\n' +
+		'    // so let the charm monster targeting check catch it.\n' +
+		'    var elements = document.getElementsByName(rightHandTargetValue);\n' +
+		'    if ((elements.length > 0)\n' +
+		'      && (elements[0].options[elements[0].selectedIndex].value == ""))\n' +
+		'    {\n' +
+		'      rightHandConfirmQuestions += "    - not direct the attack of the monster you are charming\\n";\n' +
+		'    }\n' +
 		'  }\n' +
 		'\n';
 	
