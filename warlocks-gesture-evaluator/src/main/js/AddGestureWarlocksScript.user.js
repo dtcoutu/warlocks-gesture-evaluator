@@ -834,7 +834,23 @@ function identifyCharmMonsterCouldBeCast(player)
 }
 
 /*
- * Set indicateors of whether each hand could be used to cast resist fire
+ * Set indicators of whether each hand could be used to cast remove
+ * enchantment in the next round.
+ */
+function identifyRemoveEnchantmentCouldBeCast(player)
+{
+	var removeEnchantmentGestures = "PDWP";
+
+	identifyCastableSpell(removeEnchantmentGestures, player);
+
+	validationChecks[removeEnchantmentGestures] = new Object();
+	validationChecks[removeEnchantmentGestures].gesture = "P";
+	validationChecks[removeEnchantmentGestures].targetValue = "/^[^.]+$/";
+	validationChecks[removeEnchantmentGestures].confirmQuestion = "use the default target of remove enchantment (your opponent)"
+}
+
+/*
+ * Set indicators of whether each hand could be used to cast resist fire
  * in the next round.
  */
 function identifyResistHeatCouldBeCast(player)
@@ -945,6 +961,7 @@ function processCastableSpells(player)
 			'couldSpellsBeCast.right = new Object();\n\n';
 
 		identifyCharmMonsterCouldBeCast(player);
+		identifyRemoveEnchantmentCouldBeCast(player);
 		identifyResistHeatCouldBeCast(player);
 		identifySummonMonsterCouldBeCast(player);
 	}
