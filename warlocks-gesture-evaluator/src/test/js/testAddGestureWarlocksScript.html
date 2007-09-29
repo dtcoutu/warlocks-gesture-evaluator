@@ -152,6 +152,39 @@
 		
 		assertEqualArrayOfSpellArrays(expectedResult, actualResult);
   	}
+
+  	function testEvaluateGestures_FingerOfDeath()
+  	{
+  		var inputData = "PWPFSSSD";
+  		var expectedResult = new Array();
+  		expectedResult[0] = new Array();
+  		expectedResult[0][0] = new Spell("SD", "Magic Missile");
+  		expectedResult[0][1] = new Spell("PWPFSSSD", "Finger of Death");
+  		
+  		expectedResult[1] = new Array();
+  		expectedResult[1][0] = new Spell("DFFDD", "Lightning Bolt");
+  		expectedResult[1][1] = new Spell("DFPW", "Cure Heavy Wounds");
+  		expectedResult[1][2] = new Spell("DFW", "Cure Light Wounds");
+  		expectedResult[1][3] = new Spell("DFWFd", "Blindness");
+  		expectedResult[1][4] = new Spell("DPP", "Amnesia");
+  		expectedResult[1][5] = new Spell("DSF", "Confusion");
+  		expectedResult[1][6] = new Spell("DSFFFc", "Disease");
+  		expectedResult[1][7] = new Spell("DWFFd", "Blindness");
+  		expectedResult[1][8] = new Spell("DWSSSP", "Delay Effect");
+  		expectedResult[1][9] = new Spell("DWWFWD", "Poison");
+
+  		expectedResult[2] = new Array();
+  		expectedResult[3] = new Array();
+  		expectedResult[4] = new Array();
+  		expectedResult[5] = new Array();
+  		expectedResult[6] = new Array();
+  		expectedResult[7] = new Array();
+  		expectedResult[8] = new Array();
+		
+		var actualResult = evaluateGestures(inputData);
+		
+		assertEqualArrayOfSpellArrays(expectedResult, actualResult);
+  	}
   	
     function testGetMatchedSpells()
     {
@@ -170,6 +203,14 @@
     	var matchedSpells = getMatchedSpells("D");
     	
     	assertEqualSpellArrays(expectedSpells, matchedSpells);
+    }
+    
+    function testGetMatchedSpells_FingerOfDeath()
+    {
+    	var expectedSpells = new Array();
+    	expectedSpells[0] = new Spell("PWPFSSSD", "Finger of Death");
+    	
+    	var matchedSpells = getMatchedSpells("PWPFSSSD");
     }
     
     function testIdentifySummonMonsterCouldBeCast()

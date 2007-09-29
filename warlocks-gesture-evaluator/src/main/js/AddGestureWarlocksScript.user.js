@@ -605,7 +605,7 @@ function evaluateGestures(gestures)
        // containing all matched spells and the other indexes indicating the number
        // of matched characters.
        for (var i = gestures.length - 1;
-               ((i >= 0) && (i > gestures.length - 8));
+               ((i >= 0) && (i > gestures.length - 9));
                i--)
        {
                gesturesLength = gestures.length - i;
