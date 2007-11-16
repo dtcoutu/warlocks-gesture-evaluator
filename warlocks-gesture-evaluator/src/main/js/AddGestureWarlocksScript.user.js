@@ -112,6 +112,20 @@ spellListing["WWP"] = "Protection";
 spellListing["WWS"] = "Counter Spell";
 
 /*
+ * Add a style tag to the page.
+ */
+function addStyle(css)
+{
+	var head, style;
+	head = document.getElementsByTagName("head")[0];
+	if (!head) { return; }
+	style = document.createElement("style");
+	style.type = "text/css";
+	style.innerHTML = css;
+	head.appendChild(style);
+}
+
+/*
  * Make the given string camel-cased by removing any spaces and capitalizing
  * any character following the removed space.
  */
@@ -1097,21 +1111,18 @@ function removeToken(input, token)
 
 function setSpellTableStyle()
 {
-	if (GM_addStyle)
-	{
-		// These only work in greasemonkey - not good for testing...
-		GM_addStyle("#spellSection td { padding-right: 6px; }");
-		GM_addStyle("#spellSection .alt { color: #AAAAAA; }");
-		GM_addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
-		GM_addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italics; }");
-		GM_addStyle("#spellSection th { font-size: smaller; }");
-		GM_addStyle("#spellSection strong { color: tomato; }");
-		GM_addStyle("#spellSection em { color: yellow; font-weight: bold; }");
-		GM_addStyle("#spellSection a { color: #FFFFFF; text-decoration: underline; }");
-		GM_addStyle("#spellSection .alt a { color: #AAAAAA; }");
-		GM_addStyle("#spellSection .complete a { color: #88FF88; font-weight: bold; }");
-		GM_addStyle("#spellSection .submittedComplete a { color: yellow; font-weight: bold; font-style: italics; }");
-	}
+	// These only work in greasemonkey - not good for testing...
+	addStyle("#spellSection td { padding-right: 6px; }");
+	addStyle("#spellSection .alt { color: #AAAAAA; }");
+	addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
+	addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italic; }");
+	addStyle("#spellSection th { font-size: smaller; }");
+	addStyle("#spellSection strong { color: tomato; }");
+	addStyle("#spellSection em { color: yellow; font-weight: bold; }");
+	addStyle("#spellSection a { color: #FFFFFF; text-decoration: underline; }");
+	addStyle("#spellSection .alt a { color: #AAAAAA; }");
+	addStyle("#spellSection .complete a { color: #88FF88; font-weight: bold; }");
+	addStyle("#spellSection .submittedComplete a { color: yellow; font-weight: bold; font-style: italic; }");
 }
 
 /*
