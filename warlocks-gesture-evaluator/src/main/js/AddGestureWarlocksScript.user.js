@@ -239,114 +239,13 @@ function createInputValidationScripts()
 		'  {\n' +
 		'    bothHandConfirmQuestions += "  Surrender the match!\\n";\n' +
 		'  }\n' +
-		'\n' +
-		'  if (leftHandValue == "-")\n' +
-		'  {\n' +
-		'    leftHandConfirmQuestions += "    - do no gesture with left hand\\n";\n' +
-		'  }\n' +
-		'  if ((leftHandValue == "C") && (rightHandValue != "C"))\n' +
-		'  {\n' +
-		'    leftHandConfirmQuestions += "    - clap only with left hand\\n";\n' +
-		'  }\n' +
-		'\n' +
-		'  if ((couldSpellsBeCast.left["PSDD"])\n' +
-		'    && (leftHandValue == "D"))\n' +
-		'  {\n' +
-		'    // Assumption is that if no elements are found the targetting is not right\n' +
-		'    // so let the charm monster targeting check catch it.\n' +
-		'    var elements = document.getElementsByName(leftHandTargetValue);\n' +
-		'    if ((elements.length > 0)\n' +
-		'      && (elements[0].options[elements[0].selectedIndex].value == ""))\n' +
-		'    {\n' +
-		'      leftHandConfirmQuestions += "    - not direct the attack of the monster you are charming\\n";\n' +
-		'    }\n' +
-		'  }\n' +
-		'\n';
-
-	// loop through validation checks for left hand
-	for (var check in validationChecks)
-	{
-		scriptToAdd = scriptToAdd +
-			'  if ((couldSpellsBeCast.left["' + check + '"])\n' +
-			'    && (leftHandValue == "' + validationChecks[check].gesture + '")';
-		if (validationChecks[check].spellValue != undefined)
-		{
-			scriptToAdd = scriptToAdd +
-				'\n    && (leftHandSpellValue != "' +
-				validationChecks[check].spellValue + '")';
-		}
-		
-		if (validationChecks[check].targetValue != undefined)
-		{
-			scriptToAdd = scriptToAdd +
-				'\n    && (!leftHandTargetValue.match(' +
-				validationChecks[check].targetValue + '))';
-		}
-		
-		scriptToAdd = scriptToAdd +
-		    ')\n' +	
-			'  {\n' +
-			'    leftHandConfirmQuestions += "' +
-			'    - ' +
-			validationChecks[check].confirmQuestion + '\\n";\n' +
-			'  }\n' +
-			'\n';
-	}
-
-	scriptToAdd = scriptToAdd +
-		'  if (rightHandValue == "-")\n' +
-		'  {\n' +
-		'    rightHandConfirmQuestions += "    - do no gesture with right hand\\n";\n' +
-		'  }\n' +
-		'  if ((rightHandValue == "C") && (leftHandValue != "C"))\n' +
-		'  {\n' +
-		'    rightHandConfirmQuestions += "    - clap only with right hand\\n";\n' +
-		'  }\n' +
-		'\n' +
-		'  if ((couldSpellsBeCast.right["PSDD"])\n' +
-		'    && (rightHandValue == "D")\n' +
-		'    && (rightHandTargetValue != ""))\n' +
-		'  {\n' +
-		'    // Assumption is that if no elements are found the targetting is not right\n' +
-		'    // so let the charm monster targeting check catch it.\n' +
-		'    var elements = document.getElementsByName(rightHandTargetValue);\n' +
-		'    if ((elements.length > 0)\n' +
-		'      && (elements[0].options[elements[0].selectedIndex].value == ""))\n' +
-		'    {\n' +
-		'      rightHandConfirmQuestions += "    - not direct the attack of the monster you are charming\\n";\n' +
-		'    }\n' +
-		'  }\n' +
 		'\n';
 	
-	// loop through validation checks for right hand
-	for (var check in validationChecks)
-	{
-		scriptToAdd = scriptToAdd +
-			'  if ((couldSpellsBeCast.right["' + check + '"])\n' +
-			'    && (rightHandValue == "' + validationChecks[check].gesture + '")';
-		if (validationChecks[check].spellValue != undefined)
-		{
-			scriptToAdd = scriptToAdd +
-				'\n    && (rightHandSpellValue != "' +
-				validationChecks[check].spellValue + '")';
-		}
-		
-		if (validationChecks[check].targetValue != undefined)
-		{
-			scriptToAdd = scriptToAdd +
-				'\n    && (!rightHandTargetValue.match(' +
-				validationChecks[check].targetValue + '))';
-		}
-		
-		scriptToAdd = scriptToAdd +
-		    ')\n' +	
-			'  {\n' +
-			'    rightHandConfirmQuestions += "' +
-			'    - ' +
-			validationChecks[check].confirmQuestion + '\\n";\n' +
-			'  }\n' +
-			'\n';
-	}
+	addConfirmationQuestionsForHand('left', 'right');
+	addValidationCheckForHand('left');
+
+	addConfirmationQuestionsForHand('right', 'left');
+	addValidationCheckForHand('right');
 
 	scriptToAdd = scriptToAdd +
 		'\n' +
@@ -367,6 +266,66 @@ function createInputValidationScripts()
 		'    return true;\n' +
 		'  }\n' +
 		'}\n\n';
+}
+
+function addConfirmationQuestionsForHand(primaryHandText, oppositeHandText)
+{
+	scriptToAdd = scriptToAdd +
+		'  if (' + primaryHandText + 'HandValue == "-")\n' +
+		'  {\n' +
+		'    ' + primaryHandText + 'HandConfirmQuestions += "    - do no gesture with ' + primaryHandText + ' hand\\n";\n' +
+		'  }\n' +
+		'  if ((' + primaryHandText + 'HandValue == "C") && (' + oppositeHandText + 'HandValue != "C"))\n' +
+		'  {\n' +
+		'    ' + primaryHandText + 'HandConfirmQuestions += "    - clap only with ' + primaryHandText + ' hand\\n";\n' +
+		'  }\n' +
+		'\n' +
+		'  if ((couldSpellsBeCast.' + primaryHandText + '["PSDD"])\n' +
+		'    && (' + primaryHandText + 'HandValue == "D")\n' +
+		'    && (' + primaryHandText + 'HandTargetValue != ""))\n' +
+		'  {\n' +
+		'    // Assumption is that if no elements are found the targetting is not right\n' +
+		'    // so let the charm monster targeting check catch it.\n' +
+		'    var elements = document.getElementsByName(' + primaryHandText + 'HandTargetValue);\n' +
+		'    if ((elements.length > 0)\n' +
+		'      && (elements[0].options[elements[0].selectedIndex].value == ""))\n' +
+		'    {\n' +
+		'      ' + primaryHandText + 'HandConfirmQuestions += "    - not direct the attack of the monster you are charming\\n";\n' +
+		'    }\n' +
+		'  }\n' +
+		'\n';
+}
+
+function addValidationCheckForHand(handText)
+{
+	for (var check in validationChecks)
+	{
+		scriptToAdd = scriptToAdd +
+			'  if ((couldSpellsBeCast.' + handText + '["' + check + '"])\n' +
+			'    && (' + handText + 'HandValue == "' + validationChecks[check].gesture + '")';
+		if (validationChecks[check].spellValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (' + handText + 'HandSpellValue != "' +
+				validationChecks[check].spellValue + '")';
+		}
+		
+		if (validationChecks[check].targetValue != undefined)
+		{
+			scriptToAdd = scriptToAdd +
+				'\n    && (!' + handText + 'HandTargetValue.match(' +
+				validationChecks[check].targetValue + '))';
+		}
+		
+		scriptToAdd = scriptToAdd +
+		    ')\n' +	
+			'  {\n' +
+			'    ' + handText + 'HandConfirmQuestions += "' +
+			'    - ' +
+			validationChecks[check].confirmQuestion + '\\n";\n' +
+			'  }\n' +
+			'\n';
+	}
 }
 
 /*
