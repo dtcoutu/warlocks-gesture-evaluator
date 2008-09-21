@@ -66,50 +66,6 @@ var validationChecks = new Object();
 var validGesturesRegex = new RegExp("[\-|\>|\?|C|D|F|P|S|W]+");
 
 var spellListing = new Object();
-spellListing["cDPW"] = "Dispel Magic";
-spellListing["cSWWS"] = "Summon Ice Elemental";
-spellListing["cWSSW"] = "Summon Fire Elemental";
-spellListing["cw"] = "Magic Mirror";
-spellListing["DFFDD"] = "Lightning Bolt";
-spellListing["DFPW"] = "Cure Heavy Wounds";
-spellListing["DFW"] = "Cure Light Wounds";
-spellListing["DFWFd"] = "Blindness";
-spellListing["DPP"] = "Amnesia";
-spellListing["DSF"] = "Confusion";
-spellListing["DSFFFc"] = "Disease";
-spellListing["DWFFd"] = "Blindness";
-spellListing["DWSSSP"] = "Delay Effect";
-spellListing["DWWFWD"] = "Poison";
-spellListing["FFF"] = "Paralysis (CSW --> FDP)";
-spellListing["FPSFW"] = "Summon Troll";
-spellListing["FSSDD"] = "Fireball";
-spellListing["P"] = "Shield";
-spellListing["p"] = "! Surrender";
-spellListing["PDWP"] = "Remove Enchantment";
-spellListing["PPws"] = "Invisibility";
-spellListing["PSDD"] = "Charm Monster";
-spellListing["PSDF"] = "Charm Person";
-spellListing["PSFW"] = "Summon Ogre";
-spellListing["PWPFSSSD"] = "Finger of Death";
-spellListing["PWPWWc"] = "Haste";
-spellListing["SD"] = "Magic Missile";
-spellListing["SFW"] = "Summon Goblin";
-spellListing["SPFP"] = "Anti-spell";
-spellListing["SPFPSDW"] = "Permanency";
-spellListing["SPPc"] = "Time Stop";
-spellListing["SPPFD"] = "Time Stop";
-spellListing["SSFP"] = "Resist Cold";
-spellListing["SWD"] = "Fear (No CFDS)";
-spellListing["SWWc"] = "Fire Storm";
-spellListing["WDDc"] = "+ Clap of Lightning";
-spellListing["WFP"] = "Cause Light Wounds";
-spellListing["WFPSFW"] = "Summon Giant";
-spellListing["WPFD"] = "Cause Heavy Wounds";
-spellListing["WPP"] = "Counter Spell";
-spellListing["WSSc"] = "Ice Storm";
-spellListing["WWFP"] = "Resist Heat";
-spellListing["WWP"] = "Protection";
-spellListing["WWS"] = "Counter Spell";
 
 /*
  * Add a style tag to the page.
@@ -163,46 +119,18 @@ function createJavaScript()
 {
 	var script = document.createElement("script");
 	script.innerHTML =
-		'\n// Display the spell completion table.\n' +
-		'function showSpells(playerName) {\n' +
-		'  var element = document.getElementById(\'spells_\' + playerName);\n' +
-		'  element.style.display = \'\';\n' +
-		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-		'  var oldLink = element.href;\n' +
-		'  element.href = oldLink.replace(/javascript:showSpells/,\n' +
-		'      "javascript:hideSpells");\n' +
-		'  element.replaceChild(document.createTextNode("-"), element.childNodes[0]);\n' +
-		'}\n\n' +
-		'// Hide the spell completion table.\n' +
-		'function hideSpells(playerName) {\n' +
-		'  var element = document.getElementById(\'spells_\' + playerName);\n' +
-		'  element.style.display = \'none\';\n' +
-		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-		'  var oldLink = element.href;\n' +
-		'  element.href = oldLink.replace(/javascript:hideSpells/,\n' +
-		'      "javascript:showSpells");\n' +
-		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
-		'}\n\n' +
-		'// Display the spell completion table.\n' +
-		'function showGestures(playerName) {\n' +
-		'  var element = document.getElementById(\'gestures_\' + playerName);\n' +
-		'  element.style.display = \'\';\n' +
-		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-		'  var oldLink = element.href;\n' +
-		'  element.href = oldLink.replace(/javascript:showGestures/,\n' +
-		'      "javascript:hideGestures");\n' +
-		'  element.replaceChild(document.createTextNode("-"), element.childNodes[0]);\n' +
-		'}\n\n' +
-		'// Hide the spell completion table.\n' +
-		'function hideGestures(playerName) {\n' +
-		'  var element = document.getElementById(\'gestures_\' + playerName);\n' +
-		'  element.style.display = \'none\';\n' +
-		'  element = document.getElementById(\'expandCollapseLink_\' + playerName);\n' +
-		'  var oldLink = element.href;\n' +
-		'  element.href = oldLink.replace(/javascript:hideGestures/,\n' +
-		'      "javascript:showGestures");\n' +
-		'  element.replaceChild(document.createTextNode("+"), element.childNodes[0]);\n' +
-        '}\n\n';
+		'\n// Toggle between hiding and showing the section.\n' +
+		'function toggleSectionDisplay(sectionId, linkId) {\n' +
+		'  var element = document.getElementById(sectionId);\n' +
+		'  var link = document.getElementById(linkId);\n' +
+		'  if (element.style.display == \'none\') {\n' +
+		'    element.style.display = \'\';\n' +
+		'    link.replaceChild(document.createTextNode("-"), link.childNodes[0]);\n' +
+		'  } else {\n' +
+		'    element.style.display = \'none\';\n' +
+		'    link.replaceChild(document.createTextNode("+"), link.childNodes[0]);\n' +
+		'  }\n' +
+		'}\n\n';
 	document.body.insertBefore(script, document.body.firstChild);
 }
 
@@ -441,21 +369,20 @@ function createSpellSection(player, table)
        spellCell.colSpan = 2;
        var expandCollapse = document.createElement("a");
        expandCollapse.id = "expandCollapseLink_" + player.name;
+	   
        var spellTable = document.createElement("table");
        spellTable.id = "spells_" + player.name;
+        expandCollapse.href =
+			"javascript:toggleSectionDisplay('" + spellTable.id + "', '" + expandCollapse.id + "')";
 
        if ((defaultSpellListDisplay == "none")
            || ((defaultSpellListDisplay == "user") && (!player.isUser)))
        {
-           expandCollapse.href =
-               "javascript:showSpells('" + player.name + "')";
            expandCollapse.appendChild(document.createTextNode("+"));
            spellTable.style.display = 'none';
        }
        else
        {
-           expandCollapse.href =
-               "javascript:hideSpells('" + player.name + "')";
            expandCollapse.appendChild(document.createTextNode("-"));
        }
        
@@ -470,7 +397,18 @@ function createSpellSection(player, table)
        spellHandHeaderRow.appendChild(spellHandLeftHeader);
        spellHandHeaderRow.appendChild(spellHandRightHeader);
        spellTableBody.appendChild(spellHandHeaderRow);
-
+	   
+	    // Create section for unknown gestures, if any.
+	    if ((player.hands[0].count('?') > 0) || (player.hands[1].count > 0))
+	    {
+			var unknownGestureRow = document.createElement("tr");
+			var unknownLeftHand = createUnknownGestureDropDowns(player.hands[0], player.name, "left");
+			var unknownRightHand = createUnknownGestureDropDowns(player.hands[1], player.name, "right");
+			unknownGestureRow.appendChild(unknownLeftHand);
+			unknownGestureRow.appendChild(unknownRightHand);
+			spellTableBody.appendChild(unknownGestureRow);
+	    }
+	   
        createSpellSectionContent(player, spellTableBody);
 
        spellTable.appendChild(spellTableBody);
@@ -527,6 +465,29 @@ function createSpellSectionContent(player, spellTableBody)
        }
 }
 
+function createUnknownGestureDropDowns(playerHand, playerName, handText)
+{
+	var unknownCell = document.createElement("td");
+	// Create gesture drop downs for each unknown gesture
+	var gestures = ["?", "-", ">", "C", "D", "F", "P", "S", "W"];
+	for (var i=0; i<playerHand.count('?'); i++)
+	{
+		// Select box can be created once and copied for the others.
+		var selectBox = document.createElement("select");
+		selectBox.name = "unknown_" + handText + "_" + playerName;
+		selectBox.addEventListener("change", updateUnknown, true);
+		for (var j=0; j<gestures.length; j++)
+		{
+			var option = document.createElement("option");
+			option.appendChild(document.createTextNode(gestures[j]));
+			selectBox.appendChild(option);
+		}
+		unknownCell.appendChild(selectBox);
+	}
+	
+	return unknownCell;
+}
+
 /*
  * Indicate gestures that were done with both hands by making them lower case.
  */
@@ -567,61 +528,61 @@ function determineBothHandGestures(bothHands)
  */
 function evaluateGestures(gestures)
 {
-       var currentGesture = "";
-       var gesturesExpression;
-       var gesturesToMatch = "";
-       var allMatchedSpells = new Array();
-       allMatchedSpells[0] = new Array();
-       var gestureLength = 0;
+    var currentGesture = "";
+    var gesturesExpression;
+    var gesturesToMatch = "";
+    var allMatchedSpells = new Array();
+    allMatchedSpells[0] = new Array();
+    var gestureLength = 0;
 
-       // change allMatchedSpells to be an array of arrays of Spells with 0 index
-       // containing all matched spells and the other indexes indicating the number
-       // of matched characters.
-       for (var i = gestures.length - 1;
-               ((i >= 0) && (i > gestures.length - 9));
-               i--)
-       {
-               gesturesLength = gestures.length - i;
-               // Unfortunately this plays upon the understanding that the gestures
-               // will be used within a regular expression - tighter coupling than
-               // desired.
-               currentGesture = gestures.charAt(i);
-               if (isLowerCase(currentGesture))
-               {
-                       currentGesture = "(" + currentGesture + "|" +
-                               currentGesture.toUpperCase() + ")";
-               }
-               else if (currentGesture == '?')
-               {
-                   // Probably will always be the case, but this assumes both
-                   // hands are ?.
-                   currentGesture = "(c|d|f|p|s|w|C|D|F|P|S|W)";
-               }
-               gesturesToMatch = currentGesture + gesturesToMatch;
-               var matchedSpells = getMatchedSpells(gesturesToMatch);
-               allMatchedSpells[gesturesLength] = new Array();
+    // change allMatchedSpells to be an array of arrays of Spells with 0 index
+    // containing all matched spells and the other indexes indicating the number
+    // of matched characters.
+    for (var i = gestures.length - 1;
+		   ((i >= 0) && (i > gestures.length - 9));
+		   i--)
+    {
+		var gesturesLength = gestures.length - i;
+		// Unfortunately this plays upon the understanding that the gestures
+		// will be used within a regular expression - tighter coupling than
+		// desired.
+		currentGesture = gestures.charAt(i);
+		if (isLowerCase(currentGesture))
+		{
+			currentGesture = "(" + currentGesture + "|" +
+				currentGesture.toUpperCase() + ")";
+		}
+		else if (currentGesture == '?')
+		{
+			// Probably will always be the case, but this assumes both
+			// hands are ?.
+			currentGesture = "(c|d|f|p|s|w|C|D|F|P|S|W)";
+		}
+		gesturesToMatch = currentGesture + gesturesToMatch;
+		var matchedSpells = getMatchedSpells(gesturesToMatch);
+		allMatchedSpells[gesturesLength] = new Array();
 
-               // Find completed spells
-               for (var x=0; x<matchedSpells.length; x++)
-               {
-                       var currentSpell = matchedSpells[x];
-                       if (gesturesLength == currentSpell.gestures.length)
-                       {
-                               var index = allMatchedSpells[0].length;
-                               allMatchedSpells[0][index] = currentSpell;
-                               // Might even use splice to add the item to the other array...
-                               matchedSpells.splice(x, 1);
-                               // Compensate for removing item from array.
-                               x--;
-                       }
+		// Find completed spells
+		for (var x=0; x<matchedSpells.length; x++)
+		{
+			var currentSpell = matchedSpells[x];
+			if (gesturesLength == currentSpell.gestures.length)
+			{
+				var index = allMatchedSpells[0].length;
+				allMatchedSpells[0][index] = currentSpell;
+				// Might even use splice to add the item to the other array...
+				matchedSpells.splice(x, 1);
+                // Compensate for removing item from array.
+                x--;
+            }
 
-					   allMatchedSpells = removePreviouslyMatchedSpells(currentSpell, allMatchedSpells);
-               }
+			allMatchedSpells = removePreviouslyMatchedSpells(currentSpell, allMatchedSpells);
+        }
 
-               allMatchedSpells[gesturesLength] = matchedSpells;
-       }
+        allMatchedSpells[gesturesLength] = matchedSpells;
+    }
 
-       return allMatchedSpells;
+    return allMatchedSpells;
 }
 
 /*
@@ -765,7 +726,7 @@ function hidePlayerGestures(table, player)
 	var expandCollapse = document.createElement("a");
 	expandCollapse.id = "expandCollapseLink_" + player.name;
 	expandCollapse.href =
-	    "javascript:showGestures('" + player.name + "')";
+	    "javascript:toggleSectionDisplay('gestures_" + player.name + "', '" + expandCollapse.id + "')";
 	expandCollapse.appendChild(document.createTextNode("+"));
 	expandCollapseCell.appendChild(expandCollapse);
 }
@@ -892,6 +853,54 @@ function isSpellCastableByHand(spellGestures, handSpells)
 	return couldCompleteSpell;
 }
 
+/* Function needed to allow loading from event listener. */
+function loadSpellListing() {
+	spellListing["cDPW"] = "Dispel Magic";
+	spellListing["cSWWS"] = "Summon Ice Elemental";
+	spellListing["cWSSW"] = "Summon Fire Elemental";
+	spellListing["cw"] = "Magic Mirror";
+	spellListing["DFFDD"] = "Lightning Bolt";
+	spellListing["DFPW"] = "Cure Heavy Wounds";
+	spellListing["DFW"] = "Cure Light Wounds";
+	spellListing["DFWFd"] = "Blindness";
+	spellListing["DPP"] = "Amnesia";
+	spellListing["DSF"] = "Confusion";
+	spellListing["DSFFFc"] = "Disease";
+	spellListing["DWFFd"] = "Blindness";
+	spellListing["DWSSSP"] = "Delay Effect";
+	spellListing["DWWFWD"] = "Poison";
+	spellListing["FFF"] = "Paralysis (CSW --> FDP)";
+	spellListing["FPSFW"] = "Summon Troll";
+	spellListing["FSSDD"] = "Fireball";
+	spellListing["P"] = "Shield";
+	spellListing["p"] = "! Surrender";
+	spellListing["PDWP"] = "Remove Enchantment";
+	spellListing["PPws"] = "Invisibility";
+	spellListing["PSDD"] = "Charm Monster";
+	spellListing["PSDF"] = "Charm Person";
+	spellListing["PSFW"] = "Summon Ogre";
+	spellListing["PWPFSSSD"] = "Finger of Death";
+	spellListing["PWPWWc"] = "Haste";
+	spellListing["SD"] = "Magic Missile";
+	spellListing["SFW"] = "Summon Goblin";
+	spellListing["SPFP"] = "Anti-spell";
+	spellListing["SPFPSDW"] = "Permanency";
+	spellListing["SPPc"] = "Time Stop";
+	spellListing["SPPFD"] = "Time Stop";
+	spellListing["SSFP"] = "Resist Cold";
+	spellListing["SWD"] = "Fear (No CFDS)";
+	spellListing["SWWc"] = "Fire Storm";
+	spellListing["WDDc"] = "+ Clap of Lightning";
+	spellListing["WFP"] = "Cause Light Wounds";
+	spellListing["WFPSFW"] = "Summon Giant";
+	spellListing["WPFD"] = "Cause Heavy Wounds";
+	spellListing["WPP"] = "Counter Spell";
+	spellListing["WSSc"] = "Ice Storm";
+	spellListing["WWFP"] = "Resist Heat";
+	spellListing["WWP"] = "Protection";
+	spellListing["WWS"] = "Counter Spell";
+}
+
 function modifyForGameType()
 {
 	var h2Tags = document.getElementsByTagName("h2");
@@ -944,15 +953,33 @@ function processCastableSpells(player)
  * Given a single player evaluate the gestures they are working on and update
  * the player with a list of spells for each hand.
  */
-function processPlayerHands(player)
+function processPlayerHands(player, unknownReplacements)
 {
 	// Check for submitted gestures only for the user.
 	player.submittedGestures = getSubmittedGestures(player);
+	
+	player.hands[0] = trimToMaxGesturesToEvaluate(player.hands[0]);
+	player.hands[1] = trimToMaxGesturesToEvaluate(player.hands[1]);
 	
 	player.hands[0] = trimInvalidGestures(player.hands[0]);
 	player.hands[1] = trimInvalidGestures(player.hands[1]);
 	
 	player.hands = determineBothHandGestures(player.hands);
+	
+	if (unknownReplacements != null)
+	{
+		// Need to loop through and replace the values in the string appropriately.
+		for (var i=0; i<unknownReplacements.length; i++) {
+			var startIndex = 0;
+			for (var j=0; j<unknownReplacements[i].length; j++) {
+				var index = player.hands[i].indexOf("?", startIndex);
+				player.hands[i] = player.hands[i].substring(0, index) +
+					unknownReplacements[i].substring(j, j+1) +
+					player.hands[i].substring(index + 1);
+				startIndex = index+1;
+			}
+		}
+	}
 	
 	player.spells[0] = evaluateGestures(player.hands[0]);
 	player.spells[1] = evaluateGestures(player.hands[1]);
@@ -962,6 +989,7 @@ function processPlayerHands(player)
 
 function processWarlocksPage()
 {
+	loadSpellListing();
        var players = new Array();
        var playersIndex = 0;
        var monsters = new Array();
@@ -1024,7 +1052,57 @@ function processWarlocksPage()
 	document.body.insertBefore(script, document.body.firstChild);
 
 	setSpellTableStyle();
+}
 
+function reprocessWarlocksPage(playerName, unknownReplacements)
+{
+	loadSpellListing();
+    var players = new Array();
+    var playersIndex = 0;
+    var tables = document.getElementsByTagName("table");
+
+	// Use tables[0] to get the name of the using player
+    var userName = (tables[0].getElementsByTagName("a"))[0].text;
+    // Trim off the "Log out " text
+    userName = userName.substr(8);
+    
+    modifyForGameType();
+    // Skip over the next two tables since those contain navigation stuff.
+	// Need to account for having the spells in place at this point.
+    for (var x=3; x < tables.length; x++)
+    {
+        var tds = tables[x].getElementsByTagName("td");
+
+        // The first td contains the players name
+        var nameAreaNodes = tds[0].getElementsByTagName("a");
+        if (nameAreaNodes.length == 1) {
+            player = getPlayerObject(tds);
+			if (player.isStillInGame) {
+				// Skip over their spell section regardless if we update it or not.
+				x++;
+				if (playerName == player.name) {
+					player.isUser = (player.name == userName);
+
+					// Don't bother evaluating and creating spell stuff
+					// if the player is no longer in the game.
+					player = processPlayerHands(player, unknownReplacements);
+					
+					processCastableSpells(player);
+
+					// TODO: Replace spell section with updated spells.
+					var spellTableBody = document.getElementById("spells_" + player.name).firstChild;
+					var spellTrs = spellTableBody.childNodes;
+					// Skip the first since it holds the headers and the second since it holds the unknowns.
+					for (var i=spellTrs.length-1; i>1; i--) {
+						spellTableBody.removeChild(spellTrs[i]);
+					}
+					createSpellSectionContent(player, spellTableBody);
+					// Increment one to skip over table created for spell section.
+					x++;
+				}
+			}
+        }
+    }
 }
 
 /*
@@ -1089,19 +1167,33 @@ function setSpellTableStyle()
  */
 function trimInvalidGestures(gestures)
 {
-       var workingGestures = gestures.toUpperCase();
-       var trimmedGestures = "";
-       var validGestureMatches;
-       
-       while ((workingGestures.length > 0)
-               && ((validGestureMatches = validGesturesRegex.exec(workingGestures)) != null))
-       {
-               trimmedGestures = trimmedGestures + validGestureMatches[0];
-               var newIndex = validGestureMatches.index + validGestureMatches[0].length;
-               workingGestures = workingGestures.substring(newIndex);
-       }
+    var workingGestures = gestures.toUpperCase();
+    var trimmedGestures = "";
+    var validGestureMatches;
+    
+    while ((workingGestures.length > 0)
+        && ((validGestureMatches = validGesturesRegex.exec(workingGestures)) != null))
+    {
+        trimmedGestures = trimmedGestures + validGestureMatches[0];
+        var newIndex = validGestureMatches.index + validGestureMatches[0].length;
+        workingGestures = workingGestures.substring(newIndex);
+    }
 
-       return trimmedGestures;
+    return trimmedGestures;
+}
+
+/*
+ * Trim the gestures down to only the number being used for evaluating gestures.
+ */
+function trimToMaxGesturesToEvaluate(gestures)
+{
+    var gesturesToEvaluate = gestures;
+	if (gesturesToEvaluate.length > 8)
+	{
+		gesturesToEvaluate = gesturesToEvaluate.substring(gesturesToEvaluate.length - 8);
+	}
+	
+	return gesturesToEvaluate;
 }
 
 /*
@@ -1150,5 +1242,45 @@ function updateMonsterReferences(monsters)
 		}
 	}	
 }
+
+// Update an unknown value and recalculate the spell section.
+// Assigned to the onchange event for the select boxes in a players spell section.
+function updateUnknown()
+{
+	var playerName = this.name.substring(this.name.indexOf("_", 9) + 1);
+	
+	var unknowns = document.getElementsByName("unknown_left_" + playerName);
+	var unknownReplacements = new Array();
+	unknownReplacements[0] = "";
+	unknownReplacements[1] = "";
+	for (var i=0; i<unknowns.length; i++)
+	{
+		unknownReplacements[0] += unknowns[i][unknowns[i].selectedIndex].value;
+	}
+	
+	unknowns = document.getElementsByName("unknown_right_" + playerName);
+	for (var i=0; i<unknowns.length; i++)
+	{
+		unknownReplacements[1] += unknowns[i][unknowns[i].selectedIndex].value;
+	}
+	
+	reprocessWarlocksPage(playerName, unknownReplacements);
+}
+
+String.prototype.count=function(s1) {
+	return (this.length - this.replace(new RegExp(RegExp.escape(s1),"g"), '').length) / s1.length;
+}
+RegExp.escape = (function() {
+  var specials = [
+    '/', '.', '*', '+', '?', '|',
+    '(', ')', '[', ']', '{', '}', '\\'
+  ];
+
+  sRE = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+  
+  return function(text) {
+    return text.replace(sRE, '\\$1');
+  }
+})();
 
 processWarlocksPage();
