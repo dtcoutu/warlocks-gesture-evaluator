@@ -538,11 +538,11 @@ function evaluateGestures(gestures)
     // change allMatchedSpells to be an array of arrays of Spells with 0 index
     // containing all matched spells and the other indexes indicating the number
     // of matched characters.
+	var gesturesLength = 1;
     for (var i = gestures.length - 1;
-		   ((i >= 0) && (i > gestures.length - 9));
-		   i--)
+		   (i >= 0);
+		   i--, gesturesLength++)
     {
-		var gesturesLength = gestures.length - i;
 		// Unfortunately this plays upon the understanding that the gestures
 		// will be used within a regular expression - tighter coupling than
 		// desired.
@@ -557,8 +557,12 @@ function evaluateGestures(gestures)
 			// Probably will always be the case, but this assumes both
 			// hands are ?.
 			currentGesture = "(c|d|f|p|s|w|C|D|F|P|S|W)";
+			if (gestures.charAt(i-1) == '|') {
+				currentGesture = "(C|D|F|P|S|W" + gestures.charAt(--i) + gestures.charAt(--i) + ")";
+			}
 		}
 		gesturesToMatch = currentGesture + gesturesToMatch;
+		//alert("gTM = " + gesturesToMatch);
 		var matchedSpells = getMatchedSpells(gesturesToMatch);
 		allMatchedSpells[gesturesLength] = new Array();
 
@@ -969,14 +973,25 @@ function processPlayerHands(player, unknownReplacements)
 	if (unknownReplacements != null)
 	{
 		// Need to loop through and replace the values in the string appropriately.
+		// Still assuming that a '?' will be in both hands everytime.
 		for (var i=0; i<unknownReplacements.length; i++) {
 			var startIndex = 0;
+			var modifiedIndex = 0;
+			var altIndex = (i + 1) % unknownReplacements.length;
 			for (var j=0; j<unknownReplacements[i].length; j++) {
+				// TODO: Other '?' shouldn't be all options - it should only be lowercase for value replaced here.
+				var replacementString = unknownReplacements[i].substring(j, j+1);
+				if (unknownReplacements[i][j] == '?') {
+					if (unknownReplacements[altIndex][j] != '?') {
+						replacementString = unknownReplacements[altIndex][j].toLowerCase() + "|"
+							+ unknownReplacements[i][j]
+						modifiedIndex = 2;
+					}
+				}
 				var index = player.hands[i].indexOf("?", startIndex);
 				player.hands[i] = player.hands[i].substring(0, index) +
-					unknownReplacements[i].substring(j, j+1) +
-					player.hands[i].substring(index + 1);
-				startIndex = index+1;
+					replacementString + player.hands[i].substring(index + 1);
+				startIndex = index+modifiedIndex+1;
 			}
 		}
 	}
@@ -1097,8 +1112,6 @@ function reprocessWarlocksPage(playerName, unknownReplacements)
 						spellTableBody.removeChild(spellTrs[i]);
 					}
 					createSpellSectionContent(player, spellTableBody);
-					// Increment one to skip over table created for spell section.
-					x++;
 				}
 			}
         }
