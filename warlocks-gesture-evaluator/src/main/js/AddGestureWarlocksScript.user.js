@@ -1027,6 +1027,7 @@ function processWarlocksPage()
                if (nameAreaNodes.length == 1)
                {
                        player = getPlayerObject(tds);
+					   players[players.length] = player;
 					   player.isUser = (player.name == userName);
 
                        // Don't bother evaluating and creating spell stuff
@@ -1215,24 +1216,18 @@ function trimToMaxGesturesToEvaluate(gestures)
  */
 function updateMonsterReferences(monsters)
 {
-	var dropDowns = document.getElementsByTagName("select");
+
+	var leftHandTarget = document.getElementsByName("LHT")[0];
+	updateMonsterReferenceText(leftHandTarget, monsters);
+	var rightHandTarget = document.getElementsByName("RHT")[0];
+	updateMonsterReferenceText(rightHandTarget, monsters);
 	
-	for (var x = 2; x < dropDowns.length; x++)
-	{
-	    for (var y = 0; y < dropDowns[x].length; y++)
-	    {
-	        for (var z = 0; z < monsters.length; z++)
-	        {
-	            if (monsters[z].name == dropDowns[x].options[y].value)
-	            {
-	                dropDowns[x].options[y].textContent = monsters[z].nameWithOwner;
-	            }
-	        }
-	    }
-	
-	    // Need to skip over other non-target drop downs.
-	    if (x == 2) x = x + 2;
+	for (var x = 0; x < monsters.length; x++) {
+		var monsterTarget = document.getElementsByName(monsters[x].name)[0];
+		updateMonsterReferenceText(monsterTarget, monsters);
 	}
+	
+	var dropDowns = document.getElementsByTagName("select");
 	
 	if (dropDowns.length > 0)
 	{
@@ -1254,6 +1249,16 @@ function updateMonsterReferences(monsters)
 			}
 		}
 	}	
+}
+
+function updateMonsterReferenceText(dropDownBox, monsters) {
+	for (var y = 0; y < dropDownBox.length; y++) {
+		for (var x = 0; x < monsters.length; x++) {
+			if (monsters[x].name == dropDownBox.options[y].value) {
+                dropDownBox.options[y].textContent = monsters[x].nameWithOwner;
+			}
+		}
+	}
 }
 
 // Update an unknown value and recalculate the spell section.
