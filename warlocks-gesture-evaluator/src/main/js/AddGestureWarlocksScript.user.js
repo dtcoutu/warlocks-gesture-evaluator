@@ -1060,7 +1060,9 @@ function processWarlocksPage()
                }
        }
 
-       updateMonsterReferences(monsters);
+	if (monsters.length > 0) {
+		updateMonsterReferences(monsters);
+	}
 	createJavaScript();
 	createInputValidationScripts();
 	var script = document.createElement("script");
@@ -1255,7 +1257,7 @@ function updateMonsterReferenceText(dropDownBox, monsters) {
 	for (var y = 0; y < dropDownBox.length; y++) {
 		for (var x = 0; x < monsters.length; x++) {
 			if (monsters[x].name == dropDownBox.options[y].value) {
-                dropDownBox.options[y].textContent = monsters[x].nameWithOwner;
+				dropDownBox.options[y].textContent = monsters[x].nameWithOwner;
 			}
 		}
 	}
