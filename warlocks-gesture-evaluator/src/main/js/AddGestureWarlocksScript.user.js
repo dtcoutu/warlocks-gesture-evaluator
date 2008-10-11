@@ -697,12 +697,22 @@ function getSubmittedGestures(player)
 		
 		if (foundSubmittedGestures)
 		{
-			player.hands[0] = player.hands[0] +
-				fonts[(fonts.length-fontsOffset)].textContent.substr(4, 1);
-			player.hands[1] = player.hands[1] +
-				fonts[(fonts.length-(fontsOffset-1))].textContent.substr(4, 1);
+			var leftHandGesture = fonts[(fonts.length-fontsOffset)].textContent.substr(4, 1);
+			var rightHandGesture = fonts[(fonts.length-(fontsOffset-1))].textContent.substr(4, 1);
+			
+			// If maladroit is cast on the player their left hand gesture will show up as an 'X' which is intended to indicate that it
+			// is identical to the right hand.
+			if (leftHandGesture == "X") {
+				leftHandGesture = rightHandGesture;
+			}
+			
+			player.hands[0] = player.hands[0] + leftHandGesture;
+			player.hands[1] = player.hands[1] + rightHandGesture;
 		}
 	}
+	
+	alert("fSG = " + foundSubmittedGestures);
+	alert("player.hands = " + player.hands);
 	
 	return foundSubmittedGestures;
 }
