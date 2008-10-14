@@ -493,30 +493,33 @@ function createUnknownGestureDropDowns(playerHand, playerName, handText)
  */
 function determineBothHandGestures(bothHands)
 {
-       //TODO: Ideally might want to make sure there are equal gestures, but
-       //figure the game should take care of that.
-       var workingLeftGestures = "";
-       var workingRightGestures = "";
-       var leftChar = "";
-       var rightChar = "";
-       for (var i=0; i<bothHands[0].length; i++)
-       {
-               leftChar = bothHands[0].charAt(i);
-               rightChar = bothHands[1].charAt(i);
-               if (leftChar == rightChar)
-               {
-                       workingLeftGestures = workingLeftGestures + leftChar.toLowerCase();
-                       workingRightGestures =
-                               workingRightGestures + rightChar.toLowerCase();
-               }
-               else
-               {
-                       workingLeftGestures = workingLeftGestures + leftChar;
-                       workingRightGestures = workingRightGestures + rightChar;
-               }
-       }
+    //TODO: Ideally might want to make sure there are equal gestures, but
+    //figure the game should take care of that.
+    var workingLeftGestures = "";
+    var workingRightGestures = "";
+    var leftChar = "";
+    var rightChar = "";
+    for (var i=0; i<bothHands[0].length; i++)
+    {
+        leftChar = bothHands[0].charAt(i);
+        rightChar = bothHands[1].charAt(i);
+        if (leftChar == rightChar)
+        {
+            workingLeftGestures = workingLeftGestures + leftChar.toLowerCase();
+            workingRightGestures = workingRightGestures + rightChar.toLowerCase();
+		} else if ((leftChar != "?") && (rightChar == "?")) {
+			workingLeftGestures = workingLeftGestures + leftChar.toLowerCase();
+            workingRightGestures = workingRightGestures + leftChar.toLowerCase() + "|" + rightChar;
+		} else if ((leftChar == "?") && (rightChar != "?")) {
+            workingLeftGestures = workingLeftGestures + rightChar.toLowerCase() + "|" + leftChar;
+            workingRightGestures = workingRightGestures + rightChar.toLowerCase();
+        } else {
+            workingLeftGestures = workingLeftGestures + leftChar;
+            workingRightGestures = workingRightGestures + rightChar;
+        }
+    }
 
-       return [workingLeftGestures, workingRightGestures];
+    return [workingLeftGestures, workingRightGestures];
 }
 
 /*
@@ -555,14 +558,14 @@ function evaluateGestures(gestures)
 		else if (currentGesture == '?')
 		{
 			// Probably will always be the case, but this assumes both
-			// hands are ?.
+			// hands are '?'.  Though I've worked around this with the 
+			// ability to fill in unknown gestures.
 			currentGesture = "(c|d|f|p|s|w|C|D|F|P|S|W)";
 			if (gestures.charAt(i-1) == '|') {
 				currentGesture = "(C|D|F|P|S|W" + gestures.charAt(--i) + gestures.charAt(--i) + ")";
 			}
 		}
 		gesturesToMatch = currentGesture + gesturesToMatch;
-		//alert("gTM = " + gesturesToMatch);
 		var matchedSpells = getMatchedSpells(gesturesToMatch);
 		allMatchedSpells[gesturesLength] = new Array();
 
@@ -710,9 +713,6 @@ function getSubmittedGestures(player)
 			player.hands[1] = player.hands[1] + rightHandGesture;
 		}
 	}
-	
-	alert("fSG = " + foundSubmittedGestures);
-	alert("player.hands = " + player.hands);
 	
 	return foundSubmittedGestures;
 }
@@ -978,8 +978,6 @@ function processPlayerHands(player, unknownReplacements)
 	player.hands[0] = trimInvalidGestures(player.hands[0]);
 	player.hands[1] = trimInvalidGestures(player.hands[1]);
 	
-	player.hands = determineBothHandGestures(player.hands);
-	
 	if (unknownReplacements != null)
 	{
 		// Need to loop through and replace the values in the string appropriately.
@@ -989,15 +987,7 @@ function processPlayerHands(player, unknownReplacements)
 			var modifiedIndex = 0;
 			var altIndex = (i + 1) % unknownReplacements.length;
 			for (var j=0; j<unknownReplacements[i].length; j++) {
-				// TODO: Other '?' shouldn't be all options - it should only be lowercase for value replaced here.
 				var replacementString = unknownReplacements[i].substring(j, j+1);
-				if (unknownReplacements[i][j] == '?') {
-					if (unknownReplacements[altIndex][j] != '?') {
-						replacementString = unknownReplacements[altIndex][j].toLowerCase() + "|"
-							+ unknownReplacements[i][j]
-						modifiedIndex = 2;
-					}
-				}
 				var index = player.hands[i].indexOf("?", startIndex);
 				player.hands[i] = player.hands[i].substring(0, index) +
 					replacementString + player.hands[i].substring(index + 1);
@@ -1005,6 +995,8 @@ function processPlayerHands(player, unknownReplacements)
 			}
 		}
 	}
+	
+	player.hands = determineBothHandGestures(player.hands);
 	
 	player.spells[0] = evaluateGestures(player.hands[0]);
 	player.spells[1] = evaluateGestures(player.hands[1]);
