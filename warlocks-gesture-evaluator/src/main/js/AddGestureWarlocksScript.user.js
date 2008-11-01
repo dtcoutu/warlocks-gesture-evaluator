@@ -5,7 +5,7 @@
 // ==/UserScript==
 
 /*
-     Copyright 2007 David T. Coutu
+     Copyright 2008 David T. Coutu
      
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -1109,7 +1109,6 @@ function reprocessWarlocksPage(playerName, unknownReplacements)
 					
 					processCastableSpells(player);
 
-					// TODO: Replace spell section with updated spells.
 					var spellTableBody = document.getElementById("spells_" + player.name).firstChild;
 					var spellTrs = spellTableBody.childNodes;
 					// Skip the first since it holds the headers and the second since it holds the unknowns.
