@@ -1255,10 +1255,12 @@ function updateMonsterReferences(monsters)
 }
 
 function updateMonsterReferenceText(dropDownBox, monsters) {
-	for (var y = 0; y < dropDownBox.length; y++) {
-		for (var x = 0; x < monsters.length; x++) {
-			if (monsters[x].name == dropDownBox.options[y].value) {
-				dropDownBox.options[y].textContent = monsters[x].nameWithOwner;
+	if (dropDownBox != null) {
+		for (var y = 0; y < dropDownBox.length; y++) {
+			for (var x = 0; x < monsters.length; x++) {
+				if (monsters[x].name == dropDownBox.options[y].value) {
+					dropDownBox.options[y].textContent = monsters[x].nameWithOwner;
+				}
 			}
 		}
 	}
