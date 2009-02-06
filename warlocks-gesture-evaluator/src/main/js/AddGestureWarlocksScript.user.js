@@ -5,7 +5,7 @@
 // ==/UserScript==
 
 /*
-     Copyright 2008 David T. Coutu
+     Copyright 2009 David T. Coutu
      
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -26,6 +26,12 @@ var defaultSpellListDisplay = "none";
 // Indicate whether to disable (false) or enable (true) validation check regarding
 // whether Cause Light Wounds was desired instead of Resist Heat.
 var enableResistHeatValidation = true;
+var bonusSpells = new Object();
+// Add entries to this list for unique spells that you want evaluated.  Good for custom league spells.
+// These will be evaluated for all games, but will be highlighted in blue instead of red and green.
+// Entries should look like the following:
+// bonusSpells["<gestures"] = "<spell description>";
+// bonusSpells["PSDW"] = "Psychosis - (Amnesia, Paralysis, or Fear)";
 
 function Monster(name, owner)
 {
@@ -48,10 +54,11 @@ function Player(name, leftHand, rightHand)
 	this.submittedGestures = false;
 }
 
-function Spell(gestures, name)
+function Spell(gestures, name, nonStandard)
 {
 	this.name = name;
 	this.gestures = gestures;
+	this.nonStandard = (nonStandard == null) ? false : nonStandard
 
 	// Would like to find someway to make sure given parameter is a Spell
 	this.equals = function(spell)
@@ -281,14 +288,23 @@ function createSpellElements(spells, submittedGestures)
 		var cellText = document.createTextNode(
 			currentSpell.gestures + ": ");
 
-		if (submittedGestures)
+		if (submittedGestures && currentSpell.nonStandard)
+		{
+			spellCell.className = "submittedNonStandardComplete";
+		}
+		else if (submittedGestures)
 		{
 			spellCell.className = "submittedComplete";
+		}
+		else if (currentSpell.nonStandard)
+		{
+			spellCell.className = "nonStandardComplete";
 		}
 		else
 		{
 			spellCell.className = "complete";
 		}
+
 		spellCell.appendChild(cellText);
 		spellCell.appendChild(createSpellNameAnchor(currentSpell.name));
 
@@ -307,6 +323,11 @@ function createSpellElements(spells, submittedGestures)
 			if (submittedGestures)
 			{
 				gestureIndex = i-1;
+			}
+			
+			if (currentSpell.nonStandard)
+			{
+				spellCell.className = "nonStandard";
 			}
 
 			strongText = document.createTextNode(
@@ -666,6 +687,15 @@ function getSpellsMatchExpression(expression)
 		if (expression.test(spell))
 		{
 			matchedSpells[matchedSpellsIndex] = new Spell(spell, spellListing[spell]);
+			matchedSpellsIndex++;
+		}
+	}
+	
+	for (spell in bonusSpells)
+	{
+		if (expression.test(spell))
+		{
+			matchedSpells[matchedSpellsIndex] = new Spell(spell, bonusSpells[spell], true);
 			matchedSpellsIndex++;
 		}
 	}
@@ -1170,6 +1200,9 @@ function setSpellTableStyle()
 	addStyle("#spellSection .alt { color: #AAAAAA; }");
 	addStyle("#spellSection .complete { color: #88FF88; font-weight: bold; }");
 	addStyle("#spellSection .submittedComplete { color: yellow; font-weight: bold; font-style: italic; }");
+	addStyle("#spellSection .nonStandard { text-indent: 0.5em; color: cyan; }");
+	addStyle("#spellSection .submittedNonStandardComplete { text-indent: 0.5em; color: yellow; font-weight: bold; font-style: italic; }");
+	addStyle("#spellSection .nonStandardComplete { text-indent: 0.5em; color: CornflowerBlue; font-weight: bold; }");
 	addStyle("#spellSection th { font-size: smaller; }");
 	addStyle("#spellSection strong { color: tomato; }");
 	addStyle("#spellSection em { color: yellow; font-weight: bold; }");
@@ -1177,6 +1210,9 @@ function setSpellTableStyle()
 	addStyle("#spellSection .alt a { color: #AAAAAA; }");
 	addStyle("#spellSection .complete a { color: #88FF88; font-weight: bold; }");
 	addStyle("#spellSection .submittedComplete a { color: yellow; font-weight: bold; font-style: italic; }");
+	addStyle("#spellSection .nonStandardComplete a { color: CornflowerBlue; font-weight: bold; }");
+	addStyle("#spellSection .submittedNonStandardComplete a { color: CornflowerBlue; font-weight: bold; }");
+	addStyle("#spellSection .nonStandard a { color: cyan; }");
 }
 
 /*
