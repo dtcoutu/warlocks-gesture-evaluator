@@ -1261,6 +1261,7 @@ function updateMonsterReferences(monsters)
 	var rightHandTarget = document.getElementsByName("RHT")[0];
 	updateMonsterReferenceText(rightHandTarget, monsters);
 	
+	// Update selects for directing monster attacks
 	for (var x = 0; x < monsters.length; x++) {
 		var monsterTarget = document.getElementsByName(monsters[x].name)[0];
 		updateMonsterReferenceText(monsterTarget, monsters);
@@ -1270,6 +1271,16 @@ function updateMonsterReferences(monsters)
 	
 	if (dropDowns.length > 0)
 	{
+		// Check for select for directing incoming monster attacks
+		for (var x = 0; x < dropDowns.length; x++)
+		{
+			if ((dropDowns[x].name.match("^LH:")) || (dropDowns[x].name.match("^RH:")))
+			{
+				updateMonsterReferenceText(dropDowns[x], monsters);
+			}
+		}
+		
+		// Update the text displayed for the monster's names
 		var tables = document.getElementsByTagName("table");
 		var tds = tables[tables.length-1].getElementsByTagName("td");
 	
