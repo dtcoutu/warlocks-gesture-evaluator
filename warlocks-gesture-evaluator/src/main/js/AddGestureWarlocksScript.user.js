@@ -147,12 +147,11 @@ function createJavaScript()
  */
 function createInputValidationScripts()
 {
-	var forms = (document.getElementsByTagName("form"));
-	
-	if (forms.length != 1)
-	{
+	if (!isGestureSubmissionFormAvailable()) {
 		return;
 	}
+	
+	var forms = (document.getElementsByTagName("form"));
 
     forms[0].attributes.getNamedItem('onsubmit').value = "return checkInputs(this);";
 	
@@ -863,6 +862,23 @@ function identifySummonMonsterCouldBeCast(player)
 }
 
 /*
+ * Determine if the gesture submission form is available.  Avoids the Force Surrender button form.
+ */
+function isGestureSubmissionFormAvailable()
+{
+	var available = false;
+	var forms = document.getElementsByTagName("form");
+	if (forms.length > 0) {
+		// This makes use of a quirk with the invalid structure of the 
+		if (forms[0].getElementsByTagName("input").length == 0) {
+			available = true;
+		}
+	}
+	
+	return available;
+}
+
+/*
  * Return true if the given character is lower case, otherwise false.
  */
 function isLowerCase(character)
@@ -1037,6 +1053,7 @@ function processPlayerHands(player, unknownReplacements)
 function processWarlocksPage()
 {
 	loadSpellListing();
+	isGestureSubmissionFormAvailable();
        var players = new Array();
        var playersIndex = 0;
        var monsters = new Array();
@@ -1047,7 +1064,7 @@ function processWarlocksPage()
        var userName = (tables[0].getElementsByTagName("a"))[0].text;
        // Trim off the "Log out " text
        userName = userName.substr(8);
-       
+	          
        modifyForGameType();
        // Skip over the next two tables since those contain navigation stuff.
        for (var x=3; x < tables.length; x++)
@@ -1255,7 +1272,11 @@ function trimToMaxGesturesToEvaluate(gestures)
  */
 function updateMonsterReferences(monsters)
 {
-
+	if (!isGestureSubmissionFormAvailable())
+	{
+		return;
+	}
+	
 	var leftHandTarget = document.getElementsByName("LHT")[0];
 	updateMonsterReferenceText(leftHandTarget, monsters);
 	var rightHandTarget = document.getElementsByName("RHT")[0];
